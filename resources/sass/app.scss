@@ -1,0 +1,19 @@
+@import 'variables';
+@import '~bootstrap/scss/bootstrap';
+@import '~sweetalert2/src/sweetalert2';
+
+@import 'elements/card';
+@import 'elements/navbar';
+@import 'elements/buttons';
+@import 'elements/transitions';
+
+.grecaptcha-badge {
+  display: none !important;
+  pointer-events: none !important;
+  opacity: none !important;
+}
+
+mark {
+  border-radius: 4px;
+  background-color: var(--yellow);
+}

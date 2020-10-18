@@ -1,0 +1,7 @@
+{
+  "files.exclude": {
+    "public": true,
+    "vendor": true
+  },
+  "editor.detectIndentation": false
+}
