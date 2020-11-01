@@ -51,9 +51,23 @@ class User extends Authenticatable implements JWTSubject, MustVerifyEmail
 		'photo_url',
 		'is_admin',
 		'is_norfab_user',
-    'is_profaba_user',
-    'can_read_field_trial_data'
+		'is_profaba_user',
+		'can_read_field_trial_data',
+		'user_permissions',
 	];
+	
+	/**
+	 * Get the array of permissions a user has
+	 * @return string
+	 */
+	public function getUserPermissionsAttribute()
+	{
+		$getName = function($value) {
+			return $value['name'];
+		};
+
+		return array_map($getName, $this->getAllPermissions()->toArray());
+	}
 
 	/**
 	 * Get the profile photo URL attribute.
@@ -93,9 +107,9 @@ class User extends Authenticatable implements JWTSubject, MustVerifyEmail
 	public function getIsProfabaUserAttribute()
 	{
 		return $this->hasRole('profabaUser');
-  }
-  
-  /**
+	}
+	
+	/**
 	 * Get if the user has permission to read field trial data
 	 *
 	 * @return boolean

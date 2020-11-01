@@ -46,8 +46,22 @@ class FieldTrialDataController extends Controller
 	 */
 	public function downloadAll(Request $request)
 	{
+    $project = strtolower($request->input('project'));
+    if (!in_array($project, ['norfab', 'profaba'])) {
+      return response()->json([
+				'message' => 'Project does not exist',
+			], 404);
+    }
+
+    // ProFaba database is not ready yet
+    if ($project == 'profaba') {
+      return response()->json([
+				'message' => 'ProFaba database is not available yet',
+			], 403);
+    }
+
 		$fs = Storage::getDriver();
-		$stream = $fs->readStream('field-trial-data--norfab.tar.gz');
+		$stream = $fs->readStream('field-trial-data--'.$project.'.tar.gz');
 
 		return response()->stream(
 			function() use($stream) {
@@ -254,14 +268,15 @@ class FieldTrialDataController extends Controller
   private function getPrefixedTableName(Request $request, string $tableName)
   {
     $user = $request->user();
+    $project = $request->input('project');
     if (!$user->can('read field trial data')) {
       throw new \Exception("Insufficient privilege to access field trial data");
     }
 
-    if ($user->hasRole('norfabUser')) {
+    if ($user->hasRole('norfabUser') && $project == 'norfab') {
       return 'Nor'.$tableName;
     }
-    else if ($user->hasRole('profabaUser')) {
+    else if ($user->hasRole('profabaUser') && $project == 'profaba') {
       return 'Profaba'.$tableName;
     } else {
       throw new \Exception("User role has no known columns mapped");
