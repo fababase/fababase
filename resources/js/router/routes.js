@@ -7,7 +7,8 @@ export default [
 	{ path: '/', name: 'welcome', component: page('welcome.vue') },
 
 	// Data
-	{ path: '/data/field-trial-data', name: 'field-trial-data', component: page('data/field-trial/index.vue') },
+  { path: '/data/field-trial-data', name: 'field-trial-data', component: page('data/field-trial/index.vue') },
+  { path: '/data/field-trial-genotype-data', name: 'field-trial-genotype-data', component: page('data/field-trial/genotype.vue') },
 	{ path: '/data/field-trial-db-schema', name: 'field-trial-db-schema', component: page('data/field-trial/db-schema.vue') },
 
 	// User authentication system

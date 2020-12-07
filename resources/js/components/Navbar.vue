@@ -23,6 +23,13 @@
 								<fa icon="database" fixed-width />
 								Data
 							</router-link>
+							<router-link :to="{ name: 'field-trial-genotype-data' }" class="dropdown-item pl-3">
+								<fa icon="dna" fixed-width />
+								Genotype data
+							</router-link>
+
+							<div class="dropdown-divider" />
+
 							<router-link :to="{ name: 'field-trial-db-schema' }" class="dropdown-item pl-3">
 								<fa icon="info" fixed-width />
 								Database schema

@@ -7,6 +7,7 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import {
 	faCog,
 	faDatabase,
+	faDna,
 	faInfo,
 	faLock,
 	faSignOutAlt,
@@ -22,6 +23,7 @@ import {
 library.add(
 	faCog,
 	faDatabase,
+	faDna,
 	faInfo,
 	faGithub,
 	faLock,
