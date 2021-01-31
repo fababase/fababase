@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Data;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;;
+use Illuminate\Support\Facades\Storage;
 use App\Http\Controllers\Controller;
 
 class FieldTrialDataController extends Controller
@@ -39,7 +39,7 @@ class FieldTrialDataController extends Controller
 	}
 
 	/**
-	 * Downloads the entire field trial dataset
+	 * Downloads the entire field trial dataset sans genotype data
 	 *
 	 * @param	\Illuminate\Http\Request $request
 	 * @return	\Illuminate\Http\Response
@@ -65,6 +65,87 @@ class FieldTrialDataController extends Controller
 				'Content-Type' => Storage::mimeType('field-trial-data--'.$project.'.tar.gz'),
 				'Content-disposition' => 'attachment; filename="field-trial-data--'.$project.'.tar.gz"',
 			]);
+	}
+
+	/**
+	 * Gets the filesize of the full dataset without genotype data
+	 *
+	 * @param	\Illuminate\Http\Request $request
+	 * @return	\Illuminate\Http\Response
+	 */
+	public function getDownloadAllFileSize(Request $request)
+	{
+		$project = strtolower($request->input('project'));
+    if (!in_array($project, ['norfab', 'profaba'])) {
+      return response()->json([
+				'message' => 'Project does not exist',
+			], 404);
+    }
+
+		try {
+			return response()->json([
+				'fileSize' => Storage::size('field-trial-data--'.$project.'.tar.gz'),
+			]);
+		} catch (\Exception $e) {
+			return response()->json([
+				'fileSize' => 0,
+			]);
+		}
+	}
+
+	/**
+	 * Downloads the entire genotype dataset
+	 *
+	 * @param	\Illuminate\Http\Request $request
+	 * @return	\Illuminate\Http\Response
+	 */
+	public function downloadGenotype(Request $request)
+	{
+    $project = strtolower($request->input('project'));
+    if (!in_array($project, ['norfab', 'profaba'])) {
+      return response()->json([
+				'message' => 'Project does not exist',
+			], 404);
+    }
+
+		$fs = Storage::getDriver();
+		$stream = $fs->readStream('field-trial-data--genotypes--'.$project.'.tsv.gz');
+
+		return response()->stream(
+			function() use($stream) {
+				fpassthru($stream);
+			}, 
+			200,
+			[
+				'Content-Type' => Storage::mimeType('field-trial-data--genotypes--'.$project.'.tsv.gz'),
+				'Content-disposition' => 'attachment; filename="field-trial-data--genotypes--'.$project.'.tsv.gz"',
+			]);
+	}
+
+	/**
+	 * Gets the filesize of the genotype dataset
+	 *
+	 * @param	\Illuminate\Http\Request $request
+	 * @return	\Illuminate\Http\Response
+	 */
+	public function getDownloadGenotypeFileSize(Request $request)
+	{
+		$project = strtolower($request->input('project'));
+    if (!in_array($project, ['norfab', 'profaba'])) {
+      return response()->json([
+				'message' => 'Project does not exist',
+			], 404);
+		}
+		
+		try {
+			return response()->json([
+				'fileSize' => Storage::size('field-trial-data--genotypes--'.$project.'.tsv.gz'),
+			]);
+		} catch (\Exception $e) {
+			return response()->json([
+				'fileSize' => 0,
+			]);
+		}
 	}
 
 	/**
