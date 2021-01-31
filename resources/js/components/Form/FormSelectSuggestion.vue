@@ -20,6 +20,7 @@
 				v-on:blur="onSearchTermBlur"
 				v-on:focus="onSearchTermFocus"
 				v-on:keydown.enter="onSearchTermEnter"
+				v-on:keydown.esc="resetSearch"
 				v-on:keydown.down="selectNextSearchResult()"
 				v-on:keydown.up="selectPreviousSearchResult()" />
 
@@ -84,7 +85,7 @@
 							v-bind:class="searchResultRowCssClassObject(i)"
 							v-for="(row, i) in searchResults"
 							v-bind:key="i"
-							v-on:click="selectSearchResultByIndex(i)">
+							v-on:click.stop="selectSearchResultByIndex(i)">
 							<td
 								v-for="(column, j) in row"
 								v-bind:key="j"
@@ -233,7 +234,7 @@ export default {
 				const index = Math.min(this.selectedSearchResultIndex || 0, this.searchResults.length - 1);
 				this.selectSearchResultByIndex(index);
 			}
-		},
+    },
 		prettify (columnName) {
 			return columnName.replace(/_/gi, ' ');
 		},
@@ -360,13 +361,20 @@ export default {
 				right: this.searchResultsElementRight,
 				transform: `translateY(${this.searchResultsElementTranslateY - this.viewportScrollPosition}px)`,
 			}
+    },
+		onViewportScroll () {
+			this.viewportScrollPosition = window.scrollY;
 		}
 	},
 
 	mounted () {
-		window.addEventListener('scroll', () => {
-			this.viewportScrollPosition = window.scrollY;
-		});
+		window.addEventListener('scroll', this.onViewportScroll);
+		document.addEventListener('click', this.resetSearch);
+	},
+  
+	beforeDestroy () {
+		window.removeEventListener('scroll', this.onViewportScroll);
+		document.removeEventListener('click', this.resetSearch);
 	}
 }
 </script>
