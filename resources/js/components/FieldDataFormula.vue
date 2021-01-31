@@ -33,7 +33,7 @@
 							v-for="(table, i) in sortedTables"
 							v-bind:key="i"
 							class="m-1">
-							<span class="badge badge-dark"><abbr v-bind:title="getTableFullName(table)">{{ table }}</abbr></span>
+							<span class="badge badge-dark"><component v-bind:is="getTableFullName(table) ? 'abbr' : 'span'" v-bind:title="getTableFullName(table)">{{ table }}</component></span>
 						</li>
 					</ul>
 				</template>
@@ -138,6 +138,8 @@ export default {
 					return 'Genotype';
 				case 'MN':
 					return 'Management';
+				case 'MP':
+					return 'Map';
 				case 'PD':
 					return 'Phenotype data';
 				case 'PH':
@@ -146,6 +148,8 @@ export default {
 					return 'Plot';
 				case 'SL':
 					return 'Seed lot';
+				case 'SN':
+					return 'SNP information';
 				case 'TR':
 					return 'Trial';
 				default:
