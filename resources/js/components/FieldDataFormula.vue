@@ -53,7 +53,8 @@
 			<div class="card-footer">
 				<button
 					type="submit"
-					class="btn btn-light">
+					class="btn btn-light"
+					v-on:click.stop>
 					Download
 				</button>
 			</div>
