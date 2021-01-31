@@ -23,7 +23,7 @@
 							v-model="project">
 							<option selected disabled value="">Select a project</option>
 							<option value="norfab">NorFab</option>
-							<option value="profaba" disabled>ProFaba [COMING SOON]</option>
+							<option value="profaba">ProFaba</option>
 						</select>
 						<small id="projectHelpText" class="form-text text-muted ml-3">
 							This also applies to the formulas further down this page.

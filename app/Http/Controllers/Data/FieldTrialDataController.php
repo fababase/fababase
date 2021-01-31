@@ -53,13 +53,6 @@ class FieldTrialDataController extends Controller
 			], 404);
     }
 
-    // ProFaba database is not ready yet
-    if ($project == 'profaba') {
-      return response()->json([
-				'message' => 'ProFaba database is not available yet',
-			], 403);
-    }
-
 		$fs = Storage::getDriver();
 		$stream = $fs->readStream('field-trial-data--'.$project.'.tar.gz');
 
@@ -69,8 +62,8 @@ class FieldTrialDataController extends Controller
 			}, 
 			200,
 			[
-				'Content-Type' => Storage::mimeType('field-trial-data--norfab.tar.gz'),
-				'Content-disposition' => 'attachment; filename="field-trial-data--norfab.tar.gz"',
+				'Content-Type' => Storage::mimeType('field-trial-data--'.$project.'.tar.gz'),
+				'Content-disposition' => 'attachment; filename="field-trial-data--'.$project.'.tar.gz"',
 			]);
 	}
 
@@ -275,9 +268,8 @@ class FieldTrialDataController extends Controller
 
     if ($user->hasRole('norfabUser') && $project == 'norfab') {
       return 'Nor'.$tableName;
-    }
-    else if ($user->hasRole('profabaUser') && $project == 'profaba') {
-      return 'Profaba'.$tableName;
+    } else if ($user->hasRole('profabaUser') && $project == 'profaba') {
+      return 'Pro'.$tableName;
     } else {
       throw new \Exception("User role has no known columns mapped");
     }
