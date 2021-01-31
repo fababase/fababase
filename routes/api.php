@@ -27,7 +27,10 @@ Route::group(['middleware' => 'auth:api'], function () {
 		Route::get('data/field-trial-allowed-values', 'Data\FieldTrialDataController@getAllowedValues');
 		Route::get('data/field-trial-search-by-column', 'Data\FieldTrialDataController@searchByColumn');
 		Route::get('data/field-trial-data-download', 'Data\FieldTrialDataController@download');
+		Route::get('data/field-trial-data-get-download-all-file-size', 'Data\FieldTrialDataController@getDownloadAllFileSize');
+		Route::get('data/field-trial-data-get-download-genotype-file-size', 'Data\FieldTrialDataController@getDownloadGenotypeFileSize');
 		Route::get('data/field-trial-data-download-all', 'Data\FieldTrialDataController@downloadAll');
+		Route::get('data/field-trial-data-download-genotype', 'Data\FieldTrialDataController@downloadGenotype');
 });
 
 Route::group(['middleware' => ['role:admin']], function() {

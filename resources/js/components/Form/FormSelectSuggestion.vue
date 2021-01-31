@@ -4,7 +4,8 @@
 			v-bind:for="searchTermElementId"
 			v-html="label"
 			class="col-sm-4 col-form-label"
-			v-bind:class="searchTermLabelElementCssClassObject" />
+			v-bind:class="searchTermLabelElementCssClassObject"
+			v-on:click.stop />
 
 		<div class="col-sm-8">
 			<input
@@ -17,6 +18,7 @@
 				v-bind:class="searchTermElementCssClassObject"
 				v-bind:id="searchTermElementId"
 				v-model="searchTerm"
+				v-on:click.stop
 				v-on:blur="onSearchTermBlur"
 				v-on:focus="onSearchTermFocus"
 				v-on:keydown.enter="onSearchTermEnter"
@@ -311,6 +313,9 @@ export default {
 
 			this.isInvalid = !(this.isRequired && !!this.internalValue);
 			return this.isRequired && !!this.internalValue;
+		},
+		onViewportScroll () {
+			this.viewportScrollPosition = window.scrollY;
 		}
 	},
 
@@ -361,10 +366,7 @@ export default {
 				right: this.searchResultsElementRight,
 				transform: `translateY(${this.searchResultsElementTranslateY - this.viewportScrollPosition}px)`,
 			}
-    },
-		onViewportScroll () {
-			this.viewportScrollPosition = window.scrollY;
-		}
+    }
 	},
 
 	mounted () {

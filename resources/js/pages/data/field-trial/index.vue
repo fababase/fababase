@@ -38,12 +38,23 @@
 				</p>
 
 				<a
-					class="btn btn-primary"
+					class="btn btn-secondary mr-2"
+					v-bind:class="{ 'disabled': !downloadAllFileSize }"
 					v-bind:href="downloadButtonHref"
 					target="_blank"
 					role="button">
-					Download full dataset
-					<template v-if="projectName">from the {{ projectName }} project</template>
+					<fa icon="database" fixed-width />
+					Download full dataset (without genotype data) {{downloadAllFileSizeText}}
+				</a>
+
+				<a
+					class="btn btn-light"
+					v-bind:class="{ 'disabled': !downloadGenotypeFileSize }"
+					v-bind:href="downloadGenotypeButtonHref"
+					target="_blank"
+					role="button">
+					<fa icon="dna" fixed-width />
+					Download genotype data {{downloadGenotypeFileSizeText}}
 				</a>
 			</div>
 		</div>
@@ -64,6 +75,7 @@
 import axios from "axios";
 import { mapGetters } from 'vuex'
 import FieldDataFormula from '~/components/FieldDataFormula';
+import { humanFileSize } from '~/framework/utils/string.utils';
 
 export default {
 	middleware: "can-read-field-trial-data",
@@ -81,6 +93,9 @@ export default {
 		downloadButtonHref() {
 			return `/api/data/field-trial-data-download-all?project=${this.project}`;
 		},
+		downloadGenotypeButtonHref() {
+			return `/api/data/field-trial-data-download-genotype?project=${this.project}`;
+		},
 		projectName() {
 			switch (this.project) {
 				case 'norfab':
@@ -90,6 +105,12 @@ export default {
 				default:
 					return '';
 			}
+		},
+		downloadAllFileSizeText() {
+			return this.downloadAllFileSize ? ` [${humanFileSize(this.downloadAllFileSize, true)}]` : ' [Unavailable]';
+		},
+		downloadGenotypeFileSizeText() {
+			return this.downloadGenotypeFileSize ? ` [${humanFileSize(this.downloadGenotypeFileSize, true)}]` : ' [Unavailable]';
 		}
 	},
 
@@ -97,7 +118,7 @@ export default {
 		return { title: "Phenotyping data" };
 	},
 
-	mounted() {
+	async mounted() {
 		this.formulas.forEach((formula) => {
 			formula.fields.forEach((field) => {
 				const columnNames = this.columns.map((column) => column.name);
@@ -127,6 +148,15 @@ export default {
 		},
 		project() {
 			this.populateAllowedValues();
+
+			try {
+				axios.get(`/api/data/field-trial-data-get-download-all-file-size?project=${this.project}`)
+					.then(resp => this.downloadAllFileSize = resp.data.fileSize);
+				axios.get(`/api/data/field-trial-data-get-download-genotype-file-size?project=${this.project}`)
+					.then(resp => this.downloadGenotypeFileSize = resp.data.fileSize);
+			} catch(e) {
+				console.warn(`Unable to fetch file size: ${e}`);
+			}
 		}
 	},
 	
@@ -155,6 +185,8 @@ export default {
 		return {
 			columns: [],
 			project: '',
+			downloadAllFileSize: 0,
+			downloadGenotypeFileSize: 0,
 			formulas: [
 				// RECIPE: Get data by trait
 				{
@@ -233,7 +265,7 @@ export default {
 				// RECIPE: Get genotypes with mapping information
 				{
 					id: 'get-genotypes-with-mapping-info',
-					title: 'Get genotypes with mapping information',
+					title: 'Genotype data by mapping information',
 					description: 'Retrieves all data for a given map name.',
 					fields: [
 					{
