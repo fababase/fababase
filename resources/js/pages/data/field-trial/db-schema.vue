@@ -13,7 +13,7 @@
 		<div class="container">
 			<div class="row">
 				<!--<svg-vue icon="field-data-db-schema"></svg-vue>-->
-				<img src="/images/field-data-db-schema.png" />
+				<img class="img-fluid" src="/images/field-data-db-schema.png" />
 			</div>
 		</div>
 	</main>
