@@ -292,14 +292,11 @@ class FieldTrialDataController extends Controller
         $tableTR.'.GPSCoordinates',
         $tableTR.'.PlotSize',
         $tableTR.'.PlotSizeIncludingpaths',
-        $tableTR.'.SoilDepth',
-        $tableTR.'.SoilTexture',
         $tableTR.'.SoilType',
         $tableTR.'.StartOfTrial',
         $tableTR.'.EndOfTrial',
         $tableTR.'.Description',
         $tableTR.'.Manager',
-        $tableTR.'.Distance',
         $tableTR.'.Comments'
 			)
 			->leftJoin($tablePH, $tablePD.'.PDID', '=', $tablePH.'.PDID')
@@ -353,14 +350,11 @@ class FieldTrialDataController extends Controller
         $tableTR.'.GPSCoordinates',
         $tableTR.'.PlotSize',
         $tableTR.'.PlotSizeIncludingpaths',
-        $tableTR.'.SoilDepth',
-        $tableTR.'.SoilTexture',
         $tableTR.'.SoilType',
         $tableTR.'.StartOfTrial',
         $tableTR.'.EndOfTrial',
         $tableTR.'.Description',
         $tableTR.'.Manager',
-        $tableTR.'.Distance',
         $tableTR.'.Comments'
 			)
 			->leftJoin($tablePH, $tablePD.'.PDID', '=', $tablePH.'.PDID')
@@ -414,14 +408,11 @@ class FieldTrialDataController extends Controller
         $tableTR.'.GPSCoordinates',
         $tableTR.'.PlotSize',
         $tableTR.'.PlotSizeIncludingpaths',
-        $tableTR.'.SoilDepth',
-        $tableTR.'.SoilTexture',
         $tableTR.'.SoilType',
         $tableTR.'.StartOfTrial',
         $tableTR.'.EndOfTrial',
         $tableTR.'.Description',
         $tableTR.'.Manager',
-        $tableTR.'.Distance',
         $tableTR.'.Comments'
 			)
 			->leftJoin($tablePL, $tablePH.'.PLID', '=', $tablePL.'.PLID')
