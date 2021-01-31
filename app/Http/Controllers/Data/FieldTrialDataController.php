@@ -74,11 +74,12 @@ class FieldTrialDataController extends Controller
 	 * @return	\Illuminate\Http\Response
 	 */
 	public function getAllowedValues(Request $request) {
-    $column = $request->input('column');
+		$column = $request->input('column');
 
 		$whitelist = [
+			'MapName',
 			'PDID',
-			'TRID',
+			'TRID'
 		];
 
 		try {
@@ -87,6 +88,8 @@ class FieldTrialDataController extends Controller
 			}
 
 			switch ($column) {
+				case 'MapName':
+					return DB::table($this->getPrefixedTableName($request, 'MP'))->orderByRaw("LENGTH($column)", 'ASC')->orderBy($column)->groupBy($column)->pluck($column);
 				case 'PDID':
 					return DB::table($this->getPrefixedTableName($request, 'PD'))->orderByRaw("LENGTH($column)", 'ASC')->orderBy($column)->groupBy($column)->pluck($column);
 				case 'TRID':
@@ -106,6 +109,7 @@ class FieldTrialDataController extends Controller
 		$keyword = $request->input('keyword');
 
 		$whitelist = [
+			'MapName',
 			'PDID',
 			'TRID',
 		];
@@ -116,6 +120,12 @@ class FieldTrialDataController extends Controller
 			}
 
 			switch ($column) {
+				case 'MapName':
+					return DB::table($this->getPrefixedTableName($request, 'MP'))
+						->select('MPID', 'SNID', 'MapName', 'Chromosome', 'Position', 'Comments')
+						->where('MapName', 'LIKE', '%'.$keyword.'%')
+						->groupBy('MapName')
+						->get();
 				case 'PDID':
 					return DB::table($this->getPrefixedTableName($request, 'PD'))
 						->select('PDID', 'DescriptionOfTrait', 'Grouping', 'DescriptionOfMethod', 'Comments')

@@ -156,10 +156,11 @@ export default {
 			columns: [],
 			project: '',
 			formulas: [
+				// RECIPE: Get data by trait
 				{
 					id: 'get-all-trial-data-by-phenotype',
-					title: 'Get all trial data by phenotype',
-					description: 'Retrieves all trial data for a given phenotype.',
+					title: 'By phenotype',
+					description: 'Retrieves all data for a given phenotype.',
 					fields: [
 					{
 						component: 'FormSelectSuggestion',
@@ -173,10 +174,12 @@ export default {
 					],
 					tables: ['GP','PH','PD','PL','SL','TR'],
 				},
+
+				// RECIPE: Get data by trial
 				{
 					id: 'get-all-phenotypes-scored-by-trial',
-					title: 'Get all phenotypes scored by trial',
-					description: 'Retrieves all phenotype scores for a given trial.',
+					title: 'By trial',
+					description: 'Retrieves all data for a given trial.',
 					fields: [
 					{
 						component: 'FormSelectSuggestion',
@@ -190,10 +193,12 @@ export default {
 					],
 					tables: ['GP','PH','PD','PL','SL','TR'],
 				},
+
+				// RECIPE: Get data by trial and trait
 				{
 					id: 'get-phenotype-data-by-trial-and-trait',
-					title: 'Phenotype data by trial & trait',
-					description: 'Retrieves phenotype data for a given trial identifed by Trial ID (TRID) and phenotypig trait (PDID).',
+					title: 'By trial & trait',
+					description: 'Retrieves all data for a given trial identifed by Trial ID (TRID) and phenotypig trait (PDID).',
 					fields: [
 					{
 						component: 'FormSelectSuggestion',
@@ -223,6 +228,25 @@ export default {
 					// }
 					],
 					tables: ['GP','PH','PD','PL','SL','TR'],
+				},
+
+				// RECIPE: Get genotypes with mapping information
+				{
+					id: 'get-genotypes-with-mapping-info',
+					title: 'Get genotypes with mapping information',
+					description: 'Retrieves all data for a given map name.',
+					fields: [
+					{
+						component: 'FormSelectSuggestion',
+						label: 'Map name',
+						name: 'MapName',
+						options: [],
+						value: '',
+						required: true,
+						endpoint: '/api/data/field-trial-search-by-column',
+					},
+					],
+					tables: ['GP','GT','MP','SL','SN'],
 				},
 			],
 		};
