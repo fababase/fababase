@@ -162,10 +162,12 @@ class FieldTrialDataController extends Controller
 	}
 
 	private function getTrialDataByPhenotype(Request $request) {
+    $tableGP = $this->getPrefixedTableName($request, 'GP');
     $tablePD = $this->getPrefixedTableName($request, 'PD');
     $tablePH = $this->getPrefixedTableName($request, 'PH');
     $tablePL = $this->getPrefixedTableName($request, 'PL');
     $tableTR = $this->getPrefixedTableName($request, 'TR');
+    $tableSL = $this->getPrefixedTableName($request, 'SL');
 
 		return DB::table($this->getPrefixedTableName($request, 'PD'))
 			->select(
@@ -180,12 +182,40 @@ class FieldTrialDataController extends Controller
 				$tablePD.'.Grouping',
 				$tablePD.'.DescriptionOfMethod',
         $tablePD.'.Comments',
+
+        $tableSL.'.SLID',
+        $tableSL.'.HarvestDate',
+        $tableSL.'.HarvestLocation',
+        $tableSL.'.ParentSLID',
+        $tableSL.'.Comments',
+
+        $tableGP.'.GPID',
+        $tableGP.'.Name',
+        $tableGP.'.AlternativeName',
+        $tableGP.'.Donor',
+        $tableGP.'.GeographicOrigin',
+        $tableGP.'.Maintaining',
+        $tableGP.'.Comments',
         
-				$tableTR.'.TRID'
+        $tableTR.'.TRID',
+        $tableTR.'.GPSCoordinates',
+        $tableTR.'.PlotSize',
+        $tableTR.'.PlotSizeIncludingpaths',
+        $tableTR.'.SoilDepth',
+        $tableTR.'.SoilTexture',
+        $tableTR.'.SoilType',
+        $tableTR.'.StartOfTrial',
+        $tableTR.'.EndOfTrial',
+        $tableTR.'.Description',
+        $tableTR.'.Manager',
+        $tableTR.'.Distance',
+        $tableTR.'.Comments'
 			)
 			->leftJoin($tablePH, $tablePD.'.PDID', '=', $tablePH.'.PDID')
 			->leftJoin($tablePL, $tablePH.'.PLID', '=', $tablePL.'.PLID')
-			->leftJoin($tableTR, $tablePL.'.TRID', '=', $tableTR.'.TRID')
+      ->leftJoin($tableTR, $tablePL.'.TRID', '=', $tableTR.'.TRID')
+      ->leftJoin($tableSL, $tablePL.'.SLID', '=', $tableSL.'.SLID')
+      ->leftJoin($tableGP, $tableSL.'.GPID', '=', $tableGP.'.GPID')
 			->where([
 				[$tablePH.'.PDID', '=', $request->input('PDID')],
 			])
@@ -193,9 +223,11 @@ class FieldTrialDataController extends Controller
 	}
 
 	private function getPhenotypesScoredByTrial(Request $request) {
+    $tableGP = $this->getPrefixedTableName($request, 'GP');
     $tablePD = $this->getPrefixedTableName($request, 'PD');
     $tablePH = $this->getPrefixedTableName($request, 'PH');
     $tablePL = $this->getPrefixedTableName($request, 'PL');
+    $tableSL = $this->getPrefixedTableName($request, 'SL');
     $tableTR = $this->getPrefixedTableName($request, 'TR');
 
 		return DB::table($tablePD)
@@ -211,12 +243,40 @@ class FieldTrialDataController extends Controller
 				$tablePD.'.Grouping',
 				$tablePD.'.DescriptionOfMethod',
         $tablePD.'.Comments',
+
+        $tableSL.'.SLID',
+        $tableSL.'.HarvestDate',
+        $tableSL.'.HarvestLocation',
+        $tableSL.'.ParentSLID',
+        $tableSL.'.Comments',
+
+        $tableGP.'.GPID',
+        $tableGP.'.Name',
+        $tableGP.'.AlternativeName',
+        $tableGP.'.Donor',
+        $tableGP.'.GeographicOrigin',
+        $tableGP.'.Maintaining',
+        $tableGP.'.Comments',
         
-				$tableTR.'.TRID'
+				$tableTR.'.TRID',
+        $tableTR.'.GPSCoordinates',
+        $tableTR.'.PlotSize',
+        $tableTR.'.PlotSizeIncludingpaths',
+        $tableTR.'.SoilDepth',
+        $tableTR.'.SoilTexture',
+        $tableTR.'.SoilType',
+        $tableTR.'.StartOfTrial',
+        $tableTR.'.EndOfTrial',
+        $tableTR.'.Description',
+        $tableTR.'.Manager',
+        $tableTR.'.Distance',
+        $tableTR.'.Comments'
 			)
 			->leftJoin($tablePH, $tablePD.'.PDID', '=', $tablePH.'.PDID')
 			->leftJoin($tablePL, $tablePH.'.PLID', '=', $tablePL.'.PLID')
-			->leftJoin($tableTR, $tablePL.'.TRID', '=', $tableTR.'.TRID')
+      ->leftJoin($tableTR, $tablePL.'.TRID', '=', $tableTR.'.TRID')
+      ->leftJoin($tableSL, $tablePL.'.SLID', '=', $tableSL.'.SLID')
+      ->leftJoin($tableGP, $tableSL.'.GPID', '=', $tableGP.'.GPID')
 			->where([
 				[$tableTR.'.TRID', '=', $request->input('TRID')],
 			])
@@ -234,23 +294,50 @@ class FieldTrialDataController extends Controller
 		return DB::table($tablePH)
 			->select(
 				$tablePH.'.PHID',
-				$tablePH.'.SLID',
-				$tablePH.'.PDID',
+				$tablePH.'.Date',
 				$tablePH.'.Score',
 				$tablePH.'.ScoredBy',
-				$tablePH.'.Date',
-				$tablePH.'.Comments',
-				
-				$tableGP.'.Description',
+        $tablePH.'.Comments',
+        
+				$tablePD.'.PDID',
+				$tablePD.'.DescriptionOfTrait',
+				$tablePD.'.Grouping',
 				$tablePD.'.DescriptionOfMethod',
-				$tablePL.'.GPSCoordinates',
-				$tablePL.'.PLID',
-				$tableTR.'.PlotSize'
+        $tablePD.'.Comments',
+
+        $tableSL.'.SLID',
+        $tableSL.'.HarvestDate',
+        $tableSL.'.HarvestLocation',
+        $tableSL.'.ParentSLID',
+        $tableSL.'.Comments',
+
+        $tableGP.'.GPID',
+        $tableGP.'.Name',
+        $tableGP.'.AlternativeName',
+        $tableGP.'.Donor',
+        $tableGP.'.GeographicOrigin',
+        $tableGP.'.Maintaining',
+        $tableGP.'.Comments',
+        
+				$tableTR.'.TRID',
+        $tableTR.'.GPSCoordinates',
+        $tableTR.'.PlotSize',
+        $tableTR.'.PlotSizeIncludingpaths',
+        $tableTR.'.SoilDepth',
+        $tableTR.'.SoilTexture',
+        $tableTR.'.SoilType',
+        $tableTR.'.StartOfTrial',
+        $tableTR.'.EndOfTrial',
+        $tableTR.'.Description',
+        $tableTR.'.Manager',
+        $tableTR.'.Distance',
+        $tableTR.'.Comments'
 			)
 			->leftJoin($tablePL, $tablePH.'.PLID', '=', $tablePL.'.PLID')
 			->leftJoin($tableTR, $tablePL.'.TRID', '=', $tableTR.'.TRID')
 			->leftJoin($tableGP, $tableSL.'.GPID', '=', $tableGP.'.GPID')
-			->leftJoin($tablePD, $tablePD.'.PDID', '=', $tablePH.'.PDID')
+      ->leftJoin($tablePD, $tablePD.'.PDID', '=', $tablePH.'.PDID')
+      ->leftJoin($tableSL, $tablePL.'.SLID', '=', $tableSL.'.SLID')
 			->where([
 				[$tablePH.'.PDID', '=', $request->input('PDID')],
 				[$tableTR.'.TRID', '=', $request->input('TRID')],

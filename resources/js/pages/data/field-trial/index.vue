@@ -171,7 +171,7 @@ export default {
 						endpoint: '/api/data/field-trial-search-by-column',
 					},
 					],
-					tables: ['PH','PD','PL','TR'],
+					tables: ['GP','PH','PD','PL','SL','TR'],
 				},
 				{
 					id: 'get-all-phenotypes-scored-by-trial',
@@ -188,7 +188,7 @@ export default {
 						endpoint: '/api/data/field-trial-search-by-column',
 					},
 					],
-					tables: ['PH','PD','PL','TR'],
+					tables: ['GP','PH','PD','PL','SL','TR'],
 				},
 				{
 					id: 'get-phenotype-data-by-trial-and-trait',
@@ -222,7 +222,7 @@ export default {
 					//	 required: true,
 					// }
 					],
-					tables: ['PH','PD','PL','TR','GP'],
+					tables: ['GP','PH','PD','PL','SL','TR'],
 				},
 			],
 		};
