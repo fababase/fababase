@@ -46,16 +46,6 @@
 					<fa icon="database" fixed-width />
 					Download full dataset (without genotype data) {{downloadAllFileSizeText}}
 				</a>
-
-				<a
-					class="btn btn-light"
-					v-bind:class="{ 'disabled': !downloadGenotypeFileSize }"
-					v-bind:href="downloadGenotypeButtonHref"
-					target="_blank"
-					role="button">
-					<fa icon="dna" fixed-width />
-					Download genotype data {{downloadGenotypeFileSizeText}}
-				</a>
 			</div>
 		</div>
 
@@ -92,9 +82,6 @@ export default {
 		},
 		downloadButtonHref() {
 			return `/api/data/field-trial-data-download-all?project=${this.project}`;
-		},
-		downloadGenotypeButtonHref() {
-			return `/api/data/field-trial-data-download-genotype?project=${this.project}`;
 		},
 		projectName() {
 			switch (this.project) {
@@ -152,8 +139,6 @@ export default {
 			try {
 				axios.get(`/api/data/field-trial-data-get-download-all-file-size?project=${this.project}`)
 					.then(resp => this.downloadAllFileSize = resp.data.fileSize);
-				axios.get(`/api/data/field-trial-data-get-download-genotype-file-size?project=${this.project}`)
-					.then(resp => this.downloadGenotypeFileSize = resp.data.fileSize);
 			} catch(e) {
 				console.warn(`Unable to fetch file size: ${e}`);
 			}
@@ -186,13 +171,12 @@ export default {
 			columns: [],
 			project: '',
 			downloadAllFileSize: 0,
-			downloadGenotypeFileSize: 0,
 			formulas: [
 				// RECIPE: Get data by trait
 				{
 					id: 'get-all-trial-data-by-phenotype',
-					title: 'By phenotype',
-					description: 'Retrieves all data for a given phenotype.',
+					title: 'By trait',
+					description: 'Retrieves all data for a given trait.',
 					fields: [
 					{
 						component: 'FormSelectSuggestion',
@@ -263,23 +247,23 @@ export default {
 				},
 
 				// RECIPE: Get genotypes with mapping information
-				{
-					id: 'get-genotypes-with-mapping-info',
-					title: 'Genotype data by mapping information',
-					description: 'Retrieves all data for a given map name.',
-					fields: [
-					{
-						component: 'FormSelectSuggestion',
-						label: 'Map name',
-						name: 'MapName',
-						options: [],
-						value: '',
-						required: true,
-						endpoint: '/api/data/field-trial-search-by-column',
-					},
-					],
-					tables: ['GP','GT','MP','SL','SN'],
-				},
+				// {
+				// 	id: 'get-genotypes-by-mapping-info',
+				// 	title: 'Genotype data by mapping information',
+				// 	description: 'Retrieves all data for a given map name.',
+				// 	fields: [
+				// 	{
+				// 		component: 'FormSelectSuggestion',
+				// 		label: 'Map name',
+				// 		name: 'MapName',
+				// 		options: [],
+				// 		value: '',
+				// 		required: true,
+				// 		endpoint: '/api/data/field-trial-search-by-column',
+				// 	},
+				// 	],
+				// 	tables: ['GP','GT','MP','SL','SN'],
+				// },
 			],
 		};
 	}

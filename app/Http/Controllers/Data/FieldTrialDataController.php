@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Cookie;
 
 class FieldTrialDataController extends Controller
 {
@@ -15,7 +16,24 @@ class FieldTrialDataController extends Controller
 	 */
 	public function download(Request $request)
 	{
-		$results = $this->getResultsByFormula($request);
+		$project = strtolower($request->input('project'));
+    if (!in_array($project, ['norfab', 'profaba'])) {
+      return response()->json([
+				'message' => 'Project does not exist',
+			], 404);
+		}
+		
+		if ($request->input('isfile') === '1') {
+			return $this->downloadStaticFile($request);
+		} else {
+			$results = $this->getResultsByFormula($request);
+		}
+
+		if (!count($results)) {
+			$referer = request()->headers->get('referer');
+			$cookie = Cookie::make('fababase_error', 'No rows returned');
+			return redirect()->away($referer)->withCookie($cookie);
+		}
 
 		$callback = function() use ($results) 
 		{
@@ -44,27 +62,31 @@ class FieldTrialDataController extends Controller
 	 * @param	\Illuminate\Http\Request $request
 	 * @return	\Illuminate\Http\Response
 	 */
+	private function downloadStaticFile(Request $request) {
+		switch ($request->input('formula')) {
+			case 'get-genotypes-without-mapping-data':
+				return $this->downloadGenotypingData($request);
+			case 'get-genotypes-by-map-name':
+				return $this->downloadGenotypingDataByMapName($request);
+		}
+	}
+
+	/**
+	 * Downloads the entire field trial dataset sans genotype data
+	 *
+	 * @param	\Illuminate\Http\Request $request
+	 * @return	\Illuminate\Http\Response
+	 */
 	public function downloadAll(Request $request)
 	{
     $project = strtolower($request->input('project'));
-    if (!in_array($project, ['norfab', 'profaba'])) {
+    if (!$this->isProjectValid($project)) {
       return response()->json([
 				'message' => 'Project does not exist',
 			], 404);
-    }
-
-		$fs = Storage::getDriver();
-		$stream = $fs->readStream('field-trial-data--'.$project.'.tar.gz');
-
-		return response()->stream(
-			function() use($stream) {
-				fpassthru($stream);
-			}, 
-			200,
-			[
-				'Content-Type' => Storage::mimeType('field-trial-data--'.$project.'.tar.gz'),
-				'Content-disposition' => 'attachment; filename="field-trial-data--'.$project.'.tar.gz"',
-			]);
+		}
+		
+		return $this->downloadFileByFileName('field-trial-data--'.$project.'.tar.gz');
 	}
 
 	/**
@@ -76,21 +98,13 @@ class FieldTrialDataController extends Controller
 	public function getDownloadAllFileSize(Request $request)
 	{
 		$project = strtolower($request->input('project'));
-    if (!in_array($project, ['norfab', 'profaba'])) {
+    if (!$this->isProjectValid($project)) {
       return response()->json([
 				'message' => 'Project does not exist',
 			], 404);
-    }
-
-		try {
-			return response()->json([
-				'fileSize' => Storage::size('field-trial-data--'.$project.'.tar.gz'),
-			]);
-		} catch (\Exception $e) {
-			return response()->json([
-				'fileSize' => 0,
-			]);
 		}
+		
+		return $this->getFileSizeByFileName('field-trial-data--'.$project.'.tar.gz');
 	}
 
 	/**
@@ -99,27 +113,16 @@ class FieldTrialDataController extends Controller
 	 * @param	\Illuminate\Http\Request $request
 	 * @return	\Illuminate\Http\Response
 	 */
-	public function downloadGenotype(Request $request)
+	public function downloadRawGenotype(Request $request)
 	{
     $project = strtolower($request->input('project'));
-    if (!in_array($project, ['norfab', 'profaba'])) {
+    if (!$this->isProjectValid($project)) {
       return response()->json([
 				'message' => 'Project does not exist',
 			], 404);
-    }
-
-		$fs = Storage::getDriver();
-		$stream = $fs->readStream('field-trial-data--genotypes--'.$project.'.tsv.gz');
-
-		return response()->stream(
-			function() use($stream) {
-				fpassthru($stream);
-			}, 
-			200,
-			[
-				'Content-Type' => Storage::mimeType('field-trial-data--genotypes--'.$project.'.tsv.gz'),
-				'Content-disposition' => 'attachment; filename="field-trial-data--genotypes--'.$project.'.tsv.gz"',
-			]);
+		}
+		
+		return $this->downloadFileByFileName('field-trial-data--raw-genotype--'.$project.'.xlsx.gz');
 	}
 
 	/**
@@ -131,21 +134,13 @@ class FieldTrialDataController extends Controller
 	public function getDownloadGenotypeFileSize(Request $request)
 	{
 		$project = strtolower($request->input('project'));
-    if (!in_array($project, ['norfab', 'profaba'])) {
+    if (!$this->isProjectValid($project)) {
       return response()->json([
 				'message' => 'Project does not exist',
 			], 404);
 		}
-		
-		try {
-			return response()->json([
-				'fileSize' => Storage::size('field-trial-data--genotypes--'.$project.'.tsv.gz'),
-			]);
-		} catch (\Exception $e) {
-			return response()->json([
-				'fileSize' => 0,
-			]);
-		}
+
+		return $this->getFileSizeByFileName('field-trial-data--raw-genotype--'.$project.'.xlsx.gz');
 	}
 
 	/**
@@ -376,7 +371,7 @@ class FieldTrialDataController extends Controller
     $tableSL = $this->getPrefixedTableName($request, 'SL');
     $tableTR = $this->getPrefixedTableName($request, 'TR');
 
-		return DB::table($tablePH)
+		return DB::table($tablePD)
 			->select(
 				$tablePH.'.PHID',
 				$tablePH.'.Date',
@@ -415,23 +410,51 @@ class FieldTrialDataController extends Controller
         $tableTR.'.Manager',
         $tableTR.'.Comments'
 			)
+			->leftJoin($tablePH, $tablePD.'.PDID', '=', $tablePH.'.PDID')
 			->leftJoin($tablePL, $tablePH.'.PLID', '=', $tablePL.'.PLID')
-			->leftJoin($tableTR, $tablePL.'.TRID', '=', $tableTR.'.TRID')
-			->leftJoin($tableGP, $tableSL.'.GPID', '=', $tableGP.'.GPID')
-      ->leftJoin($tablePD, $tablePD.'.PDID', '=', $tablePH.'.PDID')
+      ->leftJoin($tableTR, $tablePL.'.TRID', '=', $tableTR.'.TRID')
       ->leftJoin($tableSL, $tablePL.'.SLID', '=', $tableSL.'.SLID')
+      ->leftJoin($tableGP, $tableSL.'.GPID', '=', $tableGP.'.GPID')
 			->where([
-				[$tablePH.'.PDID', '=', $request->input('PDID')],
+				[$tablePD.'.PDID', '=', $request->input('PDID')],
 				[$tableTR.'.TRID', '=', $request->input('TRID')],
 			])
 			->get();
-  }
-  
+	}
+
+	private function downloadGenotypingData(Request $request)
+	{
+		$project = strtolower($request->input('project'));
+    if (!$this->isProjectValid($project)) {
+      return response()->json([
+				'message' => 'Project does not exist',
+			], 404);
+		}
+
+		return $this->downloadFileByFileName('field-trial-genotype-data--'.$project.'.tsv.gz');
+	}
+
+	private function downloadGenotypingDataByMapName(Request $request)
+	{
+		$project = strtolower($request->input('project'));
+    if (!$this->isProjectValid($project)) {
+      return response()->json([
+				'message' => 'Project does not exist',
+			], 404);
+		}
+
+		return $this->downloadFileByFileName('field-trial-genotype-data-by-map-name--'.$mapName.'--'.$project.'.tsv.gz');
+	}
+	
   private function getPrefixedTableName(Request $request, string $tableName)
   {
     $user = $request->user();
-    $project = $request->input('project');
-    if (!$user->can('read field trial data')) {
+		$project = $request->input('project');
+		if (!$this->isProjectValid($project)) {
+      return response()->json([
+				'message' => 'Project does not exist',
+			], 404);
+		} else  if (!$user->can('read field trial data')) {
       throw new \Exception("Insufficient privilege to access field trial data");
     }
 
@@ -442,5 +465,39 @@ class FieldTrialDataController extends Controller
     } else {
       throw new \Exception("User role has no known columns mapped");
     }
-  }
+	}
+
+	private function downloadFileByFileName(string $filename)
+	{
+		$fs = Storage::getDriver();
+		$stream = $fs->readStream($filename);
+
+		return response()->stream(
+			function() use($stream) {
+				fpassthru($stream);
+			}, 
+			200,
+			[
+				'Content-Type' => Storage::mimeType($filename),
+				'Content-disposition' => 'attachment; filename="'.$filename.'"',
+			]);
+	}
+	
+	private function getFileSizeByFileName(string $filename)
+	{
+		try {
+			return response()->json([
+				'fileSize' => Storage::size($filename),
+			]);
+		} catch (\Exception $e) {
+			return response()->json([
+				'fileSize' => 0,
+			]);
+		}
+	}
+
+	private function isProjectValid(string $project)
+	{
+    return in_array($project, ['norfab', 'profaba']);
+	}
 }

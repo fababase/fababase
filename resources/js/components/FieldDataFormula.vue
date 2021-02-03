@@ -44,6 +44,12 @@
 					name="formula"
 					v-bind:value="id" />
 
+				<!-- Static hidden field that indiciates if the server will stream a static file -->
+				<input
+					type="hidden"
+					name="isfile"
+					v-bind:value="isStaticFile ? 1 : 0" />
+
 				<!-- Static hidden field that stores the id of the formula -->
 				<input
 					type="hidden"
@@ -98,6 +104,10 @@ export default {
 			default() {
 				return [];
 			}
+		},
+		isStaticFile: {
+			type: Boolean,
+			default: false,
 		},
 		project: {
 			type: String,
@@ -158,7 +168,7 @@ export default {
 			}
 		},
 		onDownloadInitiated () {
-			const validationResults = this.$refs.formField.map((field) => field.validate());
+			const validationResults = (this.$refs.formField && this.$refs.formField.length) ? this.$refs.formField.map((field) => field.validate()) : [];
 			
 			if (validationResults.every(results => !!results)) {
 				this.$el.submit();
@@ -184,6 +194,6 @@ export default {
 			else
 				return '';
 		},
-	},
+	}
 }
 </script>
