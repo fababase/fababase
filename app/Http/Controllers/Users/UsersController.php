@@ -17,6 +17,7 @@ class UsersController extends Controller
 	public function get(Request $request)
 	{
 		$user = User::where('id', '!=', auth()->id())
+			->orderBy('name', 'asc')
 			->get();
 		return $user;
 	}

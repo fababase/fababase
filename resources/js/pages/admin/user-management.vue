@@ -21,8 +21,14 @@
 			class="table table-hover">
 			<thead>
 				<tr>
-					<th scope="col" rowspan="2">Name</th>
-					<th scope="col" rowspan="2">Email</th>
+					<th scope="col" rowspan="2" v-on:click="sortByField('name')" data-sortable>
+						<fa v-bind:class="getSortIconCssClassObjectByField('name')" v-bind:icon="getSortIconByField('name')" fixed-width />
+						Name
+					</th>
+					<th scope="col" rowspan="2" v-on:click="sortByField('email')" data-sortable>
+						<fa v-bind:class="getSortIconCssClassObjectByField('email')" v-bind:icon="getSortIconByField('email')" fixed-width />
+						Email
+					</th>
 					<th v-bind:colspan="rolesColSpan">Roles</th>
 				</tr>
 				<tr>
@@ -80,13 +86,16 @@ export default {
 			roleName: {
 				'is_norfab_user': 'NorFab',
 				'is_profaba_user': 'ProFaba',
-			}
+			},
+			sortField: null,
+			sortState: 0
 		};
 	},
 
 	async mounted() {
 		const { data } = await axios.get(`/api/users`);
-		this.users = data;
+
+		this.users = data.map((datum, i) => ({ ...datum, originalIndex: i }));
 	},
 
 	computed: {
@@ -118,6 +127,74 @@ export default {
 			});
 
 			checkboxElement.disabled = false;
+		},
+
+		getSortIconByField(field) {
+			if (this.sortField !== field) {
+				return 'sort';
+			}
+
+			switch (this.sortState) {
+				case 0:
+					return 'sort';
+
+				case 1:
+					return 'sort-up';
+
+				case 2:
+					return 'sort-down';
+
+				default:
+					return 'sort';
+			}
+		},
+
+		getSortIconCssClassObjectByField(field) {
+			const isActive = this.sortField === field && this.sortState !== 0;
+
+			return {
+				'text-muted': !isActive,
+				'text-info': isActive,
+			};
+		},
+
+		sortByField(field) {
+			switch (field) {
+				case 'name':
+					if (this.sortField !== field) {
+						this.sortState = 0;
+					}
+
+					this.sortField = field;
+					this.sortState = (this.sortState + 1) % 3;
+
+					this.users.sort((a, b) => {
+						if (this.sortState === 0) {
+							return a.originalIndex - b.originalIndex;
+						}
+
+						return a.name.localeCompare(b.name) * (this.sortState === 2 ? -1 : 1);
+					});
+
+					break;
+
+				case 'email':
+					if (this.sortField !== field) {
+						this.sortState = 0;
+					}
+
+					this.sortField = field;
+					this.sortState = (this.sortState + 1) % 3;
+
+					this.users.sort((a, b) => {
+						if (this.sortState === 0) {
+							return a.originalIndex - b.originalIndex;
+						}
+
+						return a.email.localeCompare(b.email) * (this.sortState === 2 ? -1 : 1);
+					});
+					break;
+			}
 		}
 	},
 }
@@ -144,5 +221,10 @@ $label-color: #20c997;
 		border-color: rgba($label-color, 0.5);
 		background-color: rgba($label-color, 0.5);
 	}
+}
+
+th[data-sortable] {
+	cursor: pointer;
+	user-select: none;
 }
 </style>
