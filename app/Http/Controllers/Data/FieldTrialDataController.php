@@ -199,17 +199,18 @@ class FieldTrialDataController extends Controller
 				case 'MapName':
 					return DB::table($this->getPrefixedTableName($request, 'MP'))
 						->select('MPID', 'SNID', 'MapName', 'Chromosome', 'Position', 'Comments')
-						->where('MapName', 'LIKE', '%'.$keyword.'%')
+						->where('MapName', 'LIKE', $keyword.'%')
+						->orWhereRaw("MATCH(Comments) AGAINST(?)", [$keyword])
 						->groupBy('MapName')
 						->get();
 				case 'PDID':
 					return DB::table($this->getPrefixedTableName($request, 'PD'))
 						->select('PDID', 'DescriptionOfTrait', 'Grouping', 'DescriptionOfMethod', 'Comments')
 						->where('PDID', 'LIKE', $keyword.'%')
-						->orWhere('DescriptionOfTrait', 'LIKE', '%'.$keyword.'%')
-						->orWhere('Grouping', 'LIKE', '%'.$keyword.'%')
-						->orWhere('DescriptionOfMethod', 'LIKE', '%'.$keyword.'%')
-						->orWhere('Comments', 'LIKE', '%'.$keyword.'%')
+						->orWhereRaw("MATCH(DescriptionOfTrait) AGAINST(?)", [$keyword])
+						->orWhereRaw("MATCH(Grouping) AGAINST(?)", [$keyword])
+						->orWhereRaw("MATCH(DescriptionOfMethod) AGAINST(?)", [$keyword])
+						->orWhereRaw("MATCH(Comments) AGAINST(?)", [$keyword])
 						->get();
 				case 'TRID':
 					return DB::table($this->getPrefixedTableName($request, 'TR'))
@@ -219,9 +220,9 @@ class FieldTrialDataController extends Controller
 						->orWhere('SoilType', 'LIKE', '%'.$keyword.'%')
 						->orWhere('StartOfTrial', 'LIKE', '%'.$keyword.'%')
 						->orWhere('EndOfTrial', 'LIKE', '%'.$keyword.'%')
-						->orWhere('Description', 'LIKE', '%'.$keyword.'%')
-						->orWhere('Manager', 'LIKE', '%'.$keyword.'%')
-						->orWhere('Comments', 'LIKE', '%'.$keyword.'%')
+						->orWhereRaw("MATCH(Description) AGAINST(?)", [$keyword])
+						->orWhereRaw("MATCH(Manager) AGAINST(?)", [$keyword])
+						->orWhereRaw("MATCH(Comments) AGAINST(?)", [$keyword])
 						->get();
 				default:
 					throw new \Exception("Unreachable case error: $column");
@@ -443,7 +444,7 @@ class FieldTrialDataController extends Controller
 			], 404);
 		}
 
-		return $this->downloadFileByFileName('field-trial-genotype-data-by-map-name--'.$mapName.'--'.$project.'.tsv.gz');
+		return $this->downloadFileByFileName('field-trial-genotype-data-by-map-name--'.$request->input('MapName').'--'.$project.'.tsv.gz');
 	}
 	
   private function getPrefixedTableName(Request $request, string $tableName)

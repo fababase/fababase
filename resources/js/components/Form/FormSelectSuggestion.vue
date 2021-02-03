@@ -241,9 +241,15 @@ export default {
 			return columnName.replace(/_/gi, ' ');
 		},
 		parseColumnText (value) {
+			// Force escape HTML coming from DB
+			value = escapeHtml(value);
+
 			if (value !== null) {
-				const pattern = new RegExp(`(${this.searchTerm.trim()})`, 'gi');
-				value = escapeHtml(value.toString()).replace(pattern, '<mark>$1</mark>');
+				const words = this.searchTerm.trim().split(' ');
+				words.forEach(word => {
+					const pattern = new RegExp(`(${word})`, 'gi');
+					value = value.toString().replace(pattern, '<mark>$1</mark>');
+				});
 			} else {
 				value = '–';
 			}
