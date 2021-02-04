@@ -56,13 +56,15 @@
 
 			<div
 				v-if="shouldShowPrompt && isFocused"
-				class="search-results bg-white rounded shadow-lg p-3 text-muted">
+				class="search-results bg-white rounded shadow-lg p-3 text-muted"
+				v-bind:style="searchResultsElementCssStyleObject">
 				<em>Continue typing to narrow down results&hellip;</em>
 			</div>
 
 			<div
 				v-if="shouldShowNoResultsNotice && isFocused"
-				class="search-results bg-danger rounded shadow-lg p-3 text-white">
+				class="search-results bg-danger rounded shadow-lg p-3 text-white"
+				v-bind:style="searchResultsElementCssStyleObject">
 				<strong>No results found.</strong> Please try another keyword.
 			</div>
 
@@ -144,7 +146,7 @@ export default {
 
 	data() {
 		return {
-			keywordLengthThreshold: 1,
+			keywordLengthThreshold: 2,
 			internalValue: '',
 			keyword: '',
 			searchResults: [],
@@ -244,7 +246,7 @@ export default {
 			// Force escape HTML coming from DB
 			value = escapeHtml(value);
 
-			if (value !== null) {
+			if (value) {
 				const words = this.searchTerm.trim().split(' ');
 				words.forEach(word => {
 					const pattern = new RegExp(`(${word})`, 'gi');
@@ -310,7 +312,7 @@ export default {
 			const { data } = await axios.get(`/api/data/field-trial-search-by-column?column=${this.name}&keyword=${keyword.trim()}&project=${this.project}`);
 			this.searchResults = data;
 
-			this.shouldShowNoResultsNotice = !data.length;
+			this.shouldShowNoResultsNotice = !data.length && this.searchTerm.length >= this.keywordLengthThreshold;
 		}),
 		validate () {
 			if (!this.isRequired) {
