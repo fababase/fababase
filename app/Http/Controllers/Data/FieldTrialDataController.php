@@ -213,8 +213,17 @@ class FieldTrialDataController extends Controller
 						->orWhereRaw("MATCH(Comments) AGAINST(?)", [$keyword])
 						->get();
 				case 'TRID':
-					return DB::table($this->getPrefixedTableName($request, 'TR'))
-						->select('TRID', 'PlotSize', 'SoilType', 'StartOfTrial', 'EndOfTrial', 'Description', 'Manager', 'Comments')
+					$query = DB::table($this->getPrefixedTableName($request, 'TR'))
+						->select('TRID', 'PlotSize', 'SoilType');
+
+					// ProFaba contains additional columns
+					if ($request->input('project') === 'profaba') {
+						$query->addSelect('SoilTexture', 'SoilDepth', 'Distance');
+					}
+
+					$query->addSelect('StartOfTrial', 'EndOfTrial', 'Description', 'Manager', 'Comments');
+
+					$query	
 						->where('TRID', 'LIKE', $keyword.'%')
 						->orWhere('PlotSize', 'LIKE', '%'.$keyword.'%')
 						->orWhere('SoilType', 'LIKE', '%'.$keyword.'%')
@@ -222,8 +231,9 @@ class FieldTrialDataController extends Controller
 						->orWhere('EndOfTrial', 'LIKE', '%'.$keyword.'%')
 						->orWhereRaw("MATCH(Description) AGAINST(?)", [$keyword])
 						->orWhereRaw("MATCH(Manager) AGAINST(?)", [$keyword])
-						->orWhereRaw("MATCH(Comments) AGAINST(?)", [$keyword])
-						->get();
+						->orWhereRaw("MATCH(Comments) AGAINST(?)", [$keyword]);
+
+					return $query->get();
 				default:
 					throw new \Exception("Unreachable case error: $column");
 			}
@@ -256,7 +266,7 @@ class FieldTrialDataController extends Controller
     $tableTR = $this->getPrefixedTableName($request, 'TR');
     $tableSL = $this->getPrefixedTableName($request, 'SL');
 
-		return DB::table($this->getPrefixedTableName($request, 'PD'))
+		$query = DB::table($this->getPrefixedTableName($request, 'PD'))
 			->select(
 				$tablePH.'.PHID',
 				$tablePH.'.Date',
@@ -282,19 +292,34 @@ class FieldTrialDataController extends Controller
         $tableGP.'.Donor',
         $tableGP.'.GeographicOrigin',
         $tableGP.'.Maintaining',
-        $tableGP.'.Comments',
-        
-        $tableTR.'.TRID',
-        $tableTR.'.GPSCoordinates',
-        $tableTR.'.PlotSize',
-        $tableTR.'.PlotSizeIncludingpaths',
-        $tableTR.'.SoilType',
-        $tableTR.'.StartOfTrial',
-        $tableTR.'.EndOfTrial',
-        $tableTR.'.Description',
-        $tableTR.'.Manager',
-        $tableTR.'.Comments'
-			)
+        $tableGP.'.Comments'
+			);
+
+		// ProFaba contains additional columns for TR table
+		$project = $request->input('project');
+		$query->addSelect(
+			$tableTR.'.TRID',
+			$tableTR.'.GPSCoordinates',
+			$tableTR.'.PlotSize',
+			$tableTR.'.PlotSizeIncludingpaths',
+			$tableTR.'.SoilType'
+		);
+		if ($project === 'profab') {
+			$query->addSelect(
+				$tableTR.'.SoilTexture',
+				$tableTR.'.SoilDepth',
+				$tableTR.'.Distance'
+			);
+		}
+		$query->addSelect(
+			$tableTR.'.StartOfTrial',
+			$tableTR.'.EndOfTrial',
+			$tableTR.'.Description',
+			$tableTR.'.Manager',
+			$tableTR.'.Comments'
+		);
+
+		$query
 			->leftJoin($tablePH, $tablePD.'.PDID', '=', $tablePH.'.PDID')
 			->leftJoin($tablePL, $tablePH.'.PLID', '=', $tablePL.'.PLID')
       ->leftJoin($tableTR, $tablePL.'.TRID', '=', $tableTR.'.TRID')
@@ -302,8 +327,9 @@ class FieldTrialDataController extends Controller
       ->leftJoin($tableGP, $tableSL.'.GPID', '=', $tableGP.'.GPID')
 			->where([
 				[$tablePH.'.PDID', '=', $request->input('PDID')],
-			])
-			->get(); 
+			]);
+
+		return $query->get();
 	}
 
 	private function getPhenotypesScoredByTrial(Request $request) {
@@ -314,7 +340,7 @@ class FieldTrialDataController extends Controller
     $tableSL = $this->getPrefixedTableName($request, 'SL');
     $tableTR = $this->getPrefixedTableName($request, 'TR');
 
-		return DB::table($tablePD)
+		$query = DB::table($tablePD)
 			->select(
 				$tablePH.'.PHID',
 				$tablePH.'.Date',
@@ -340,19 +366,34 @@ class FieldTrialDataController extends Controller
         $tableGP.'.Donor',
         $tableGP.'.GeographicOrigin',
         $tableGP.'.Maintaining',
-        $tableGP.'.Comments',
-        
-				$tableTR.'.TRID',
-        $tableTR.'.GPSCoordinates',
-        $tableTR.'.PlotSize',
-        $tableTR.'.PlotSizeIncludingpaths',
-        $tableTR.'.SoilType',
-        $tableTR.'.StartOfTrial',
-        $tableTR.'.EndOfTrial',
-        $tableTR.'.Description',
-        $tableTR.'.Manager',
-        $tableTR.'.Comments'
-			)
+        $tableGP.'.Comments'
+			);
+
+		// ProFaba contains additional columns for TR table
+		$project = $request->input('project');
+		$query->addSelect(
+			$tableTR.'.TRID',
+			$tableTR.'.GPSCoordinates',
+			$tableTR.'.PlotSize',
+			$tableTR.'.PlotSizeIncludingpaths',
+			$tableTR.'.SoilType'
+		);
+		if ($project === 'profab') {
+			$query->addSelect(
+				$tableTR.'.SoilTexture',
+				$tableTR.'.SoilDepth',
+				$tableTR.'.Distance'
+			);
+		}
+		$query->addSelect(
+			$tableTR.'.StartOfTrial',
+			$tableTR.'.EndOfTrial',
+			$tableTR.'.Description',
+			$tableTR.'.Manager',
+			$tableTR.'.Comments'
+		);
+
+		$query
 			->leftJoin($tablePH, $tablePD.'.PDID', '=', $tablePH.'.PDID')
 			->leftJoin($tablePL, $tablePH.'.PLID', '=', $tablePL.'.PLID')
       ->leftJoin($tableTR, $tablePL.'.TRID', '=', $tableTR.'.TRID')
@@ -360,8 +401,9 @@ class FieldTrialDataController extends Controller
       ->leftJoin($tableGP, $tableSL.'.GPID', '=', $tableGP.'.GPID')
 			->where([
 				[$tableTR.'.TRID', '=', $request->input('TRID')],
-			])
-			->get();
+			]);
+		
+		return $query->get();
 	}
 
 	private function getPhenotypeDataByTrialAndTrait(Request $request) {
@@ -372,7 +414,7 @@ class FieldTrialDataController extends Controller
     $tableSL = $this->getPrefixedTableName($request, 'SL');
     $tableTR = $this->getPrefixedTableName($request, 'TR');
 
-		return DB::table($tablePD)
+		$query = DB::table($tablePD)
 			->select(
 				$tablePH.'.PHID',
 				$tablePH.'.Date',
@@ -398,19 +440,34 @@ class FieldTrialDataController extends Controller
         $tableGP.'.Donor',
         $tableGP.'.GeographicOrigin',
         $tableGP.'.Maintaining',
-        $tableGP.'.Comments',
-        
-				$tableTR.'.TRID',
-        $tableTR.'.GPSCoordinates',
-        $tableTR.'.PlotSize',
-        $tableTR.'.PlotSizeIncludingpaths',
-        $tableTR.'.SoilType',
-        $tableTR.'.StartOfTrial',
-        $tableTR.'.EndOfTrial',
-        $tableTR.'.Description',
-        $tableTR.'.Manager',
-        $tableTR.'.Comments'
-			)
+        $tableGP.'.Comments'
+			);
+
+		// ProFaba contains additional columns for TR table
+		$project = $request->input('project');
+		$query->addSelect(
+			$tableTR.'.TRID',
+			$tableTR.'.GPSCoordinates',
+			$tableTR.'.PlotSize',
+			$tableTR.'.PlotSizeIncludingpaths',
+			$tableTR.'.SoilType'
+		);
+		if ($project === 'profab') {
+			$query->addSelect(
+				$tableTR.'.SoilTexture',
+				$tableTR.'.SoilDepth',
+				$tableTR.'.Distance'
+			);
+		}
+		$query->addSelect(
+			$tableTR.'.StartOfTrial',
+			$tableTR.'.EndOfTrial',
+			$tableTR.'.Description',
+			$tableTR.'.Manager',
+			$tableTR.'.Comments'
+		);
+
+		$query
 			->leftJoin($tablePH, $tablePD.'.PDID', '=', $tablePH.'.PDID')
 			->leftJoin($tablePL, $tablePH.'.PLID', '=', $tablePL.'.PLID')
       ->leftJoin($tableTR, $tablePL.'.TRID', '=', $tableTR.'.TRID')
@@ -419,8 +476,9 @@ class FieldTrialDataController extends Controller
 			->where([
 				[$tablePD.'.PDID', '=', $request->input('PDID')],
 				[$tableTR.'.TRID', '=', $request->input('TRID')],
-			])
-			->get();
+			]);
+		
+		return $query->get();
 	}
 
 	private function downloadGenotypingData(Request $request)
