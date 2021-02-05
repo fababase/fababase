@@ -12,7 +12,7 @@
 		<div class="container">
 			<div class="row">
 				<p>
-					We are still quite new&mdash;there is&rsquo;much to show here.
+					We are still quite new&mdash;there isn&rsquo;t much to show here.
 					However, if you're looking to access
 					<router-link :to="{ name: 'field-trial-data' }">field trial</router-link> and
 					<router-link :to="{ name: 'field-trial-genotype-data' }">genotype</router-link>
