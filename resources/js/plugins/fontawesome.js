@@ -15,6 +15,8 @@ import {
 	faSortDown,
 	faSortUp,
 	faUser,
+	faUserFriends,
+	faUsers,
 	faUsersCog,
 	faUserShield,
 } from '@fortawesome/free-solid-svg-icons'
@@ -35,6 +37,8 @@ library.add(
 	faSortDown,
 	faSortUp,
 	faUser,
+	faUserFriends,
+	faUsers,
 	faUsersCog,
 	faUserShield,
 )
