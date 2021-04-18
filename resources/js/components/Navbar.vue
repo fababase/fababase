@@ -37,6 +37,11 @@
 							</router-link>
 						</div>
 					</li>
+					<li class="nav-item">
+						<router-link :to="{ name: 'resources' }" class="nav-link">
+							Resources
+						</router-link>
+					</li>
 				</ul>
 
 				<ul class="navbar-nav ml-auto">

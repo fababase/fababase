@@ -11,6 +11,9 @@ export default [
   { path: '/data/field-trial-genotype-data', name: 'field-trial-genotype-data', component: page('data/field-trial/genotype.vue') },
 	{ path: '/data/field-trial-db-schema', name: 'field-trial-db-schema', component: page('data/field-trial/db-schema.vue') },
 
+	// Resources
+	{ path: '/resources', name: 'resources', component: page('resources.vue') },
+
 	// User authentication system
 	{ path: '/login', name: 'login', component: page('auth/login.vue') },
 	{ path: '/register', name: 'register', component: page('auth/register.vue') },
