@@ -11,7 +11,7 @@
 			<input
 				type="text"
 				class="form-control"
-				autocomplete="false"
+				autocomplete="off"
 				placeholder="Start typing to search…"
 				key="searchTerm"
 				v-if="!internalValue"
@@ -58,7 +58,7 @@
 				v-if="shouldShowPrompt && isFocused"
 				class="search-results bg-white rounded shadow-lg p-3 text-muted"
 				v-bind:style="searchResultsElementCssStyleObject">
-				<em>Continue typing to narrow down results&hellip;</em>
+				<em>Continue typing to refine results&hellip;</em>
 			</div>
 
 			<div

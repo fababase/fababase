@@ -200,17 +200,17 @@ class FieldTrialDataController extends Controller
 					return DB::table($this->getPrefixedTableName($request, 'MP'))
 						->select('MPID', 'SNID', 'MapName', 'Chromosome', 'Position', 'Comments')
 						->where('MapName', 'LIKE', $keyword.'%')
-						->orWhereRaw("MATCH(Comments) AGAINST(?)", [$keyword])
+						->orWhere('Comments', 'LIKE', '%'.$keyword.'%')
 						->groupBy('MapName')
 						->get();
 				case 'PDID':
 					return DB::table($this->getPrefixedTableName($request, 'PD'))
 						->select('PDID', 'DescriptionOfTrait', 'Grouping', 'DescriptionOfMethod', 'Comments')
 						->where('PDID', 'LIKE', $keyword.'%')
-						->orWhereRaw("MATCH(DescriptionOfTrait) AGAINST(?)", [$keyword])
-						->orWhereRaw("MATCH(Grouping) AGAINST(?)", [$keyword])
-						->orWhereRaw("MATCH(DescriptionOfMethod) AGAINST(?)", [$keyword])
-						->orWhereRaw("MATCH(Comments) AGAINST(?)", [$keyword])
+						->orWhere('DescriptionOfTrait', 'LIKE', '%'.$keyword.'%')
+						->orWhere('Grouping', 'LIKE', '%'.$keyword.'%')
+						->orWhere('DescriptionOfMethod', 'LIKE', '%'.$keyword.'%')
+						->orWhere('Comments', 'LIKE', '%'.$keyword.'%')
 						->get();
 				case 'TRID':
 					$query = DB::table($this->getPrefixedTableName($request, 'TR'))
@@ -229,9 +229,9 @@ class FieldTrialDataController extends Controller
 						->orWhere('SoilType', 'LIKE', '%'.$keyword.'%')
 						->orWhere('StartOfTrial', 'LIKE', '%'.$keyword.'%')
 						->orWhere('EndOfTrial', 'LIKE', '%'.$keyword.'%')
-						->orWhereRaw("MATCH(Description) AGAINST(?)", [$keyword])
-						->orWhereRaw("MATCH(Manager) AGAINST(?)", [$keyword])
-						->orWhereRaw("MATCH(Comments) AGAINST(?)", [$keyword]);
+						->orWhere('Description', 'LIKE', '%'.$keyword.'%')
+						->orWhere('Manager', 'LIKE', '%'.$keyword.'%')
+						->orWhere('Comments', 'LIKE', '%'.$keyword.'%');
 
 					return $query->get();
 				default:
