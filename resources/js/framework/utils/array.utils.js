@@ -40,3 +40,22 @@ export function pickNonUniqueItems(arr, minCount) {
 	
 	return nonUniqueItems;
 }
+
+/** @method */
+export function textualJoin(arr, separator, finalSeparator) {
+	// Defaults
+	separator = separator || ',';
+	finalSeparator = finalSeparator || 'and';
+
+	const arrCopy = [...arr];
+
+	// Shortcircuit if array has a single item
+	if (arrCopy.length === 1) {
+		return arrCopy[0];
+	}
+
+	const lastItem = arrCopy.pop();
+
+	// NOTE: Use oxford comma if array length > 2
+	return arrCopy.join(separator + ' ') + (arr.length > 2 ? `${separator} ` : ' ') + finalSeparator + ' ' + lastItem;
+}

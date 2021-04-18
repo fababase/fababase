@@ -9,13 +9,9 @@
 		<div class="container">
 			<div class="list-group">
 				<a v-for="(resource, i) in resources" v-bind:key="i" v-bind:href="resource.url" class="list-group-item list-group-item-action p-4">
-					<h2 class="h4 mb-1">{{ resource.title }}</h2>
-					<ul class="list-inline">
-						<li v-for="(author, j) in resource.authors" v-bind:key="j" class="list-inline-item">
-							<small>{{ author.name }}</small>
-						</li>
-					</ul>
-					<p class="mb-1">{{ resource.description }}</p>
+					<h2 class="h4 mb-2">{{ resource.title }}</h2>
+					<span class="d-block text-muted mb-3"><fa icon="user" size="sm" />&nbsp;{{ getAuthors(resource.authors) }}</span>
+					<p class="m-0">{{ resource.description }}</p>
 				</a>
 			</div>
 		</div>
@@ -23,6 +19,8 @@
 </template>
 
 <script>
+import { textualJoin } from '~/framework/utils/array.utils';
+
 export default {
   layout: 'default',
 
@@ -40,7 +38,13 @@ into a generic genotype format as well as EMMAX and plink outputs useful for dow
 				name: 'Cathrine Kiel Skovbjerg'
 			}]
 		}]
-  })
+	}),
+	
+	methods: {
+		getAuthors(authors) {
+			return textualJoin(authors.map(author => author.name));
+		}
+	}
 }
 </script>
 
