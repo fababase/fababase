@@ -214,7 +214,7 @@ export default {
 				hour: '2-digit',
 				minute: '2-digit',
 			});
-			return dateTimeFormat.format(new Date(dateString));
+			return dateTimeFormat.format(new Date(dateString.replace(/\s+/g, 'T')));
 		},
 
 		sortByField(field) {
