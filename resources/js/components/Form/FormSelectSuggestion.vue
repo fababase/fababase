@@ -170,7 +170,7 @@ export default {
 			});
 		},
 		searchTerm (value) {
-			if (this.searchTerm.length < this.keywordLengthThreshold) {
+			if (this.searchTerm.trim().length < this.keywordLengthThreshold) {
 				this.shouldShowNoResultsNotice = false;
 			}
 		},
@@ -209,7 +209,7 @@ export default {
 		onSearchTermBlur () {
 			window.setTimeout(() => {
 				this.isFocused = false;
-				this.isInvalid = !this.internalValue && this.searchTerm;
+				this.isInvalid = !this.internalValue && this.searchTerm.trim();
 			}, 250);
 
 			// If there's only one result we just preselect it
@@ -247,11 +247,8 @@ export default {
 			value = escapeHtml(value);
 
 			if (value) {
-				const words = this.searchTerm.trim().split(' ');
-				words.forEach(word => {
-					const pattern = new RegExp(`(${word})`, 'gi');
-					value = value.toString().replace(pattern, '<mark>$1</mark>');
-				});
+				const pattern = new RegExp(`(${this.searchTerm.trim()})`, 'gi');
+				value = value.toString().replace(pattern, '<mark>$1</mark>');
 			} else {
 				value = '–';
 			}
@@ -309,10 +306,10 @@ export default {
 			};
 		},
 		updateSearchResult: debounce(250, async function(keyword) {
-			const { data } = await axios.get(`/api/data/field-trial-search-by-column?column=${this.name}&keyword=${keyword.trim()}&project=${this.project}`);
+			const { data } = await axios.get(`/api/data/field-trial-search-by-column?column=${this.name}&keyword=${keyword}&project=${this.project}`);
 			this.searchResults = data;
 
-			this.shouldShowNoResultsNotice = !data.length && this.searchTerm.length >= this.keywordLengthThreshold;
+			this.shouldShowNoResultsNotice = !data.length && this.searchTerm.trim().length >= this.keywordLengthThreshold;
 		}),
 		validate () {
 			if (!this.isRequired) {
@@ -340,12 +337,12 @@ export default {
 			},
 			set: function(keyword) {
 				this.keyword = keyword;
-				if (this.keyword.length < this.keywordLengthThreshold) {
+				if (this.keyword.trim().length < this.keywordLengthThreshold) {
 					this.searchResults = [];
 					return;
 				}
 
-				this.updateSearchResult(keyword);
+				this.updateSearchResult(this.keyword.trim());
 			}
 		},
 		resultsColumnNames () {
@@ -356,7 +353,7 @@ export default {
 			return Object.keys(this.searchResults[0]);
 		},
 		shouldShowPrompt () {
-			return !this.searchResults.length && this.searchTerm.length < this.keywordLengthThreshold && this.searchTerm.length > 0;
+			return !this.searchResults.length && this.searchTerm.trim().length < this.keywordLengthThreshold && this.searchTerm.trim().length > 0;
 		},
 		searchTermLabelElementCssClassObject () {
 			return {
