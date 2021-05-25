@@ -142,11 +142,14 @@ export default {
 			type: String,
 			required: true,
 		},
+		shouldShowAllResultsOnFocus: {
+			type: Boolean,
+			default: true,
+		}
 	},
 
 	data() {
 		return {
-			keywordLengthThreshold: 2,
 			internalValue: '',
 			keyword: '',
 			searchResults: [],
@@ -177,6 +180,10 @@ export default {
 		isFocused (value) {
 			if (value) {
 				this.updateSearchResultsLayout();
+
+				if (this.searchTerm.trim().length >= this.keywordLengthThreshold) {
+					this.updateSearchResult('');
+				}
 			}
 		},
 		searchResults (value) {
@@ -246,10 +253,11 @@ export default {
 			// Force escape HTML coming from DB
 			value = escapeHtml(value);
 
-			if (value) {
-				const pattern = new RegExp(`(${this.searchTerm.trim()})`, 'gi');
+			const trimmedSearchTerm = this.searchTerm.trim();
+			if (value && trimmedSearchTerm) {
+				const pattern = new RegExp(`(${trimmedSearchTerm})`, 'gi');
 				value = value.toString().replace(pattern, '<mark>$1</mark>');
-			} else {
+			} else if (!value) {
 				value = '–';
 			}
 			
@@ -305,7 +313,7 @@ export default {
 				'table-active': index === this.selectedSearchResultIndex || this.searchResults.length === 1,
 			};
 		},
-		updateSearchResult: debounce(250, async function(keyword) {
+		updateSearchResult: debounce(100, async function(keyword) {
 			const { data } = await axios.get(`/api/data/field-trial-search-by-column?column=${this.name}&keyword=${keyword}&project=${this.project}`);
 			this.searchResults = data;
 
@@ -325,6 +333,9 @@ export default {
 	},
 
 	computed: {
+		keywordLengthThreshold () {
+			return this.shouldShowAllResultsOnFocus ? 0 : 2;
+		},
 		searchTermElementId () {
 			return `form-selection-suggestion-${count++}`;
 		},

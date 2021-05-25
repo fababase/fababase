@@ -195,23 +195,34 @@ class FieldTrialDataController extends Controller
 				throw new \Exception("The column provided, $column, is invalid");
 			}
 
+			$hasKeyword = strlen($keyword);
+
 			switch ($column) {
 				case 'MapName':
-					return DB::table($this->getPrefixedTableName($request, 'MP'))
-						->select('MPID', 'SNID', 'MapName', 'Chromosome', 'Position', 'Comments')
-						->where('MapName', 'LIKE', $keyword.'%')
-						->orWhere('Comments', 'LIKE', '%'.$keyword.'%')
-						->groupBy('MapName')
-						->get();
+					$query = DB::table($this->getPrefixedTableName($request, 'MP'))
+						->select('MPID', 'SNID', 'MapName', 'Chromosome', 'Position', 'Comments');
+
+					if ($hasKeyword) {
+						$query
+							->where('MapName', 'LIKE', $keyword.'%')
+							->orWhere('Comments', 'LIKE', '%'.$keyword.'%');
+					}
+
+					return $query->groupBy('MapName')->get();
 				case 'PDID':
-					return DB::table($this->getPrefixedTableName($request, 'PD'))
-						->select('PDID', 'DescriptionOfTrait', 'Grouping', 'DescriptionOfMethod', 'Comments')
-						->where('PDID', 'LIKE', $keyword.'%')
-						->orWhere('DescriptionOfTrait', 'LIKE', '%'.$keyword.'%')
-						->orWhere('Grouping', 'LIKE', '%'.$keyword.'%')
-						->orWhere('DescriptionOfMethod', 'LIKE', '%'.$keyword.'%')
-						->orWhere('Comments', 'LIKE', '%'.$keyword.'%')
-						->get();
+					$query = DB::table($this->getPrefixedTableName($request, 'PD'))
+						->select('PDID', 'DescriptionOfTrait', 'Grouping', 'DescriptionOfMethod', 'Comments');
+
+					if ($hasKeyword) {
+						$query
+							->where('PDID', 'LIKE', $keyword.'%')
+							->orWhere('DescriptionOfTrait', 'LIKE', '%'.$keyword.'%')
+							->orWhere('Grouping', 'LIKE', '%'.$keyword.'%')
+							->orWhere('DescriptionOfMethod', 'LIKE', '%'.$keyword.'%')
+							->orWhere('Comments', 'LIKE', '%'.$keyword.'%');
+					}
+
+					return $query->get();
 				case 'TRID':
 					$query = DB::table($this->getPrefixedTableName($request, 'TR'))
 						->select('TRID', 'PlotSize', 'SoilType');
@@ -223,15 +234,17 @@ class FieldTrialDataController extends Controller
 
 					$query->addSelect('StartOfTrial', 'EndOfTrial', 'Description', 'Manager', 'Comments');
 
-					$query	
-						->where('TRID', 'LIKE', $keyword.'%')
-						->orWhere('PlotSize', 'LIKE', '%'.$keyword.'%')
-						->orWhere('SoilType', 'LIKE', '%'.$keyword.'%')
-						->orWhere('StartOfTrial', 'LIKE', '%'.$keyword.'%')
-						->orWhere('EndOfTrial', 'LIKE', '%'.$keyword.'%')
-						->orWhere('Description', 'LIKE', '%'.$keyword.'%')
-						->orWhere('Manager', 'LIKE', '%'.$keyword.'%')
-						->orWhere('Comments', 'LIKE', '%'.$keyword.'%');
+					if ($hasKeyword) {
+						$query	
+							->where('TRID', 'LIKE', $keyword.'%')
+							->orWhere('PlotSize', 'LIKE', '%'.$keyword.'%')
+							->orWhere('SoilType', 'LIKE', '%'.$keyword.'%')
+							->orWhere('StartOfTrial', 'LIKE', '%'.$keyword.'%')
+							->orWhere('EndOfTrial', 'LIKE', '%'.$keyword.'%')
+							->orWhere('Description', 'LIKE', '%'.$keyword.'%')
+							->orWhere('Manager', 'LIKE', '%'.$keyword.'%')
+							->orWhere('Comments', 'LIKE', '%'.$keyword.'%');
+					}
 
 					return $query->get();
 				default:
