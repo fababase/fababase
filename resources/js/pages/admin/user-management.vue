@@ -206,7 +206,11 @@ export default {
 			return email.replace('@', '<wbr>@');
 		},
 
-		getFormattedTime(dateString) {
+		getFormattedTime(dateString, fallback = 'n.a.') {
+			if (!dateString) {
+				return fallback;
+			}
+			
 			const dateTimeFormat = new Intl.DateTimeFormat('en-GB', {
 				year: 'numeric',
 				month: 'short',
