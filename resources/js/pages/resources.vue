@@ -72,7 +72,7 @@ into a generic genotype format as well as EMMAX and plink outputs useful for dow
 		}, {
 			title: 'ProFaba VCF',
 			description: '',
-			url: '/api/resources/download?file=profaba/20220128_norfab_genotypes_imputed.vcf',
+			url: '/api/resources/download?file=profaba/20220128_profaba_genotypes_imputed.vcf.gz',
 			authors: [{
 				name: 'Cathrine Kiel Skovbjerg'
 			}],
@@ -80,7 +80,7 @@ into a generic genotype format as well as EMMAX and plink outputs useful for dow
 		}, {
 			title: 'NorFab VCF',
 			description: '',
-			url: '/api/resources/download?file=norfab/20220211_norfab_genotypes_imputed.vcf',
+			url: '/api/resources/download?file=norfab/20220211_norfab_genotypes_imputed.vcf.gz',
 			authors: [{
 				name: 'Cathrine Kiel Skovbjerg'
 			}],
