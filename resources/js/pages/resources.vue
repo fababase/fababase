@@ -8,13 +8,13 @@
 
 		<div class="container">
 			<div class="list-group">
-				<a v-for="(resource, i) in resources" v-bind:key="i" v-bind:href="resource.url" class="list-group-item list-group-item-action p-4">
+				<a v-for="(resource, i) in filteredResources" v-bind:key="i" v-bind:href="resource.url" class="list-group-item list-group-item-action p-4">
 					<h2 class="h4 mb-2">{{ resource.title }}</h2>
-					<span v-if="resource.authors.length" class="d-block text-muted mb-3">
+					<span v-if="resource.authors.length" class="d-block text-muted">
 						<fa v-bind:icon="getAuthorsIcon(resource.authors.length)" size="sm" fixed-width />
 						{{ getAuthors(resource.authors) }}
 					</span>
-					<p class="m-0">{{ resource.description }}</p>
+					<p class="m-0 mt-3" v-if="resource.description">{{ resource.description }}</p>
 				</a>
 			</div>
 		</div>
@@ -22,6 +22,7 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex';
 import { textualJoin } from '~/framework/utils/array.utils';
 
 export default {
@@ -40,6 +41,50 @@ into a generic genotype format as well as EMMAX and plink outputs useful for dow
 			authors: [{
 				name: 'Cathrine Kiel Skovbjerg'
 			}]
+		}, {
+			title: 'Seed images',
+			description: '',
+			url: 'https://figshare.com/s/d85788585f0e7ccc27a5',
+			authors: [{
+				name: 'Cathrine Kiel Skovbjerg'
+			}]
+		}, {
+			title: 'Field plans',
+			description: '',
+			url: 'https://figshare.com/s/b6ca10b17d953a9a942f',
+			authors: [{
+				name: 'Cathrine Kiel Skovbjerg'
+			}]
+		}, {
+			title: 'Relationship matrices',
+			description: '',
+			url: 'https://figshare.com/s/91d0f4b0c43bfb6c7f8b',
+			authors: [{
+				name: 'Cathrine Kiel Skovbjerg'
+			}]
+		}, {
+			title: 'Other resources',
+			description: '',
+			url: 'https://figshare.com/s/2e7917fd572a66684b8e',
+			authors: [{
+				name: 'Cathrine Kiel Skovbjerg'
+			}]
+		}, {
+			title: 'ProFaba VCF',
+			description: '',
+			url: '/api/resources/download?file=profaba/20220128_PROFABAgenotypes_Imputed.vcf',
+			authors: [{
+				name: 'Cathrine Kiel Skovbjerg'
+			}],
+			access: 'profaba'
+		}, {
+			title: 'NorFab VCF',
+			description: '',
+			url: '/api/resources/download?file=norfab/20220211_NORFABgenotypes_Imputed.vcf',
+			authors: [{
+				name: 'Cathrine Kiel Skovbjerg'
+			}],
+			access: 'norfab'
 		}]
 	}),
 	
@@ -56,6 +101,26 @@ into a generic genotype format as well as EMMAX and plink outputs useful for dow
 				return 'users';
 			}
 		},
+	},
+
+	computed: {
+		...mapGetters({
+			user: 'auth/user'
+		}),
+		filteredResources() {
+			return this.resources.filter(({ access }) => {
+				switch (access) {
+					case 'profaba':
+						return this.user.is_profaba_user || this.user.is_admin;
+
+					case 'norfab':
+						return this.user.is_norfab_user || this.user.is_admin;
+
+					default:
+						return true;
+				}
+			});
+		}
 	}
 }
 </script>

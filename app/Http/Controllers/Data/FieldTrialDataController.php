@@ -526,7 +526,7 @@ class FieldTrialDataController extends Controller
       return response()->json([
 				'message' => 'Project does not exist',
 			], 404);
-		} else  if (!$user->can('read field trial data')) {
+		} else if (!$user->can('read field trial data')) {
       throw new \Exception("Insufficient privilege to access field trial data");
     }
 
