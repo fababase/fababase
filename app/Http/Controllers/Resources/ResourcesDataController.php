@@ -25,22 +25,6 @@ class ResourcesDataController extends Controller
 			return abort(403);
 		}
 
-		return $this->downloadFileByFileName($file);
-	}
-
-	private function downloadFileByFileName(string $filename)
-	{
-		$fs = Storage::getDriver();
-		$stream = $fs->readStream($filename);
-
-		return response()->stream(
-			function() use($stream) {
-				fpassthru($stream);
-			}, 
-			200,
-			[
-				'Content-Type' => Storage::mimeType($filename),
-				'Content-disposition' => 'attachment; filename="'.$filename.'"',
-			]);
+		return Storage::download($file);
 	}
 }
