@@ -15,18 +15,18 @@
 						<a
 							class="nav-link dropdown-toggle text-dark"
 							href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-							Field trial
+							Data
 						</a>
 
 						<div class="dropdown-menu">
 							<router-link :to="{ name: 'field-trial-data' }" class="dropdown-item pl-3">
 								<fa icon="database" fixed-width />
-								Data
+								Field trials
 							</router-link>
 
 							<router-link :to="{ name: 'field-trial-genotype-data' }" class="dropdown-item pl-3">
 								<fa icon="dna" fixed-width />
-								Genotype data
+								Genotypes
 							</router-link>
 
 							<div class="dropdown-divider" />
