@@ -21,6 +21,18 @@
         </div>
       </div>
 
+			<!-- Gravatar -->
+			<div class="form-group row">
+				<div class="col-md-3 col-form-div text-md-right">Avatar</div>
+				<div class="col-md-7">
+					<img :src="user.photo_url" class="rounded d-block" alt="...">
+					<small class="form-text text-muted">
+						Image is used from the email ({{user.email}}) associated with your Gravatar account.
+						To change it, go to <a href="https://gravatar.com">gravatar.com</a>.
+					</small>
+				</div>
+			</div>
+
       <!-- Submit Button -->
       <div class="form-group row">
         <div class="col-md-9 ml-md-auto">
