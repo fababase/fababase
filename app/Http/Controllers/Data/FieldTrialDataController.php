@@ -279,59 +279,7 @@ class FieldTrialDataController extends Controller
     $tableTR = $this->getPrefixedTableName($request, 'TR');
     $tableSL = $this->getPrefixedTableName($request, 'SL');
 
-		$query = DB::table($this->getPrefixedTableName($request, 'PD'))
-			->select(
-				$tablePH.'.PHID',
-				$tablePH.'.Date',
-				$tablePH.'.Score',
-				$tablePH.'.ScoredBy',
-        $tablePH.'.Comments',
-        
-				$tablePD.'.PDID',
-				$tablePD.'.DescriptionOfTrait',
-				$tablePD.'.Grouping',
-				$tablePD.'.DescriptionOfMethod',
-        $tablePD.'.Comments',
-
-        $tableSL.'.SLID',
-        $tableSL.'.HarvestDate',
-        $tableSL.'.HarvestLocation',
-        $tableSL.'.ParentSLID',
-        $tableSL.'.Comments',
-
-        $tableGP.'.GPID',
-        $tableGP.'.Name',
-        $tableGP.'.AlternativeName',
-        $tableGP.'.Donor',
-        $tableGP.'.GeographicOrigin',
-        $tableGP.'.Maintaining',
-        $tableGP.'.Comments'
-			);
-
-		// ProFaba contains additional columns for TR table
-		$project = $request->input('project');
-		$query->addSelect(
-			$tableTR.'.TRID',
-			$tableTR.'.GPSCoordinates',
-			$tableTR.'.PlotSize',
-			$tableTR.'.PlotSizeIncludingpaths',
-			$tableTR.'.SoilType'
-		);
-		if ($project === 'profab') {
-			$query->addSelect(
-				$tableTR.'.SoilTexture',
-				$tableTR.'.SoilDepth',
-				$tableTR.'.Distance'
-			);
-		}
-		$query->addSelect(
-			$tableTR.'.StartOfTrial',
-			$tableTR.'.EndOfTrial',
-			$tableTR.'.Description',
-			$tableTR.'.Manager',
-			$tableTR.'.Comments'
-		);
-
+		$query = $this->getBaseQuery($request);
 		$query
 			->leftJoin($tablePH, $tablePD.'.PDID', '=', $tablePH.'.PDID')
 			->leftJoin($tablePL, $tablePH.'.PLID', '=', $tablePL.'.PLID')
@@ -353,59 +301,7 @@ class FieldTrialDataController extends Controller
     $tableSL = $this->getPrefixedTableName($request, 'SL');
     $tableTR = $this->getPrefixedTableName($request, 'TR');
 
-		$query = DB::table($tablePD)
-			->select(
-				$tablePH.'.PHID',
-				$tablePH.'.Date',
-				$tablePH.'.Score',
-				$tablePH.'.ScoredBy',
-        $tablePH.'.Comments',
-        
-				$tablePD.'.PDID',
-				$tablePD.'.DescriptionOfTrait',
-				$tablePD.'.Grouping',
-				$tablePD.'.DescriptionOfMethod',
-        $tablePD.'.Comments',
-
-        $tableSL.'.SLID',
-        $tableSL.'.HarvestDate',
-        $tableSL.'.HarvestLocation',
-        $tableSL.'.ParentSLID',
-        $tableSL.'.Comments',
-
-        $tableGP.'.GPID',
-        $tableGP.'.Name',
-        $tableGP.'.AlternativeName',
-        $tableGP.'.Donor',
-        $tableGP.'.GeographicOrigin',
-        $tableGP.'.Maintaining',
-        $tableGP.'.Comments'
-			);
-
-		// ProFaba contains additional columns for TR table
-		$project = $request->input('project');
-		$query->addSelect(
-			$tableTR.'.TRID',
-			$tableTR.'.GPSCoordinates',
-			$tableTR.'.PlotSize',
-			$tableTR.'.PlotSizeIncludingpaths',
-			$tableTR.'.SoilType'
-		);
-		if ($project === 'profab') {
-			$query->addSelect(
-				$tableTR.'.SoilTexture',
-				$tableTR.'.SoilDepth',
-				$tableTR.'.Distance'
-			);
-		}
-		$query->addSelect(
-			$tableTR.'.StartOfTrial',
-			$tableTR.'.EndOfTrial',
-			$tableTR.'.Description',
-			$tableTR.'.Manager',
-			$tableTR.'.Comments'
-		);
-
+		$query = $this->getBaseQuery($request);
 		$query
 			->leftJoin($tablePH, $tablePD.'.PDID', '=', $tablePH.'.PDID')
 			->leftJoin($tablePL, $tablePH.'.PLID', '=', $tablePL.'.PLID')
@@ -427,59 +323,7 @@ class FieldTrialDataController extends Controller
     $tableSL = $this->getPrefixedTableName($request, 'SL');
     $tableTR = $this->getPrefixedTableName($request, 'TR');
 
-		$query = DB::table($tablePD)
-			->select(
-				$tablePH.'.PHID',
-				$tablePH.'.Date',
-				$tablePH.'.Score',
-				$tablePH.'.ScoredBy',
-        $tablePH.'.Comments',
-        
-				$tablePD.'.PDID',
-				$tablePD.'.DescriptionOfTrait',
-				$tablePD.'.Grouping',
-				$tablePD.'.DescriptionOfMethod',
-        $tablePD.'.Comments',
-
-        $tableSL.'.SLID',
-        $tableSL.'.HarvestDate',
-        $tableSL.'.HarvestLocation',
-        $tableSL.'.ParentSLID',
-        $tableSL.'.Comments',
-
-        $tableGP.'.GPID',
-        $tableGP.'.Name',
-        $tableGP.'.AlternativeName',
-        $tableGP.'.Donor',
-        $tableGP.'.GeographicOrigin',
-        $tableGP.'.Maintaining',
-        $tableGP.'.Comments'
-			);
-
-		// ProFaba contains additional columns for TR table
-		$project = $request->input('project');
-		$query->addSelect(
-			$tableTR.'.TRID',
-			$tableTR.'.GPSCoordinates',
-			$tableTR.'.PlotSize',
-			$tableTR.'.PlotSizeIncludingpaths',
-			$tableTR.'.SoilType'
-		);
-		if ($project === 'profab') {
-			$query->addSelect(
-				$tableTR.'.SoilTexture',
-				$tableTR.'.SoilDepth',
-				$tableTR.'.Distance'
-			);
-		}
-		$query->addSelect(
-			$tableTR.'.StartOfTrial',
-			$tableTR.'.EndOfTrial',
-			$tableTR.'.Description',
-			$tableTR.'.Manager',
-			$tableTR.'.Comments'
-		);
-
+		$query = $this->getBaseQuery($request);
 		$query
 			->leftJoin($tablePH, $tablePD.'.PDID', '=', $tablePH.'.PDID')
 			->leftJoin($tablePL, $tablePH.'.PLID', '=', $tablePL.'.PLID')
@@ -571,5 +415,91 @@ class FieldTrialDataController extends Controller
 	private function isProjectValid(string $project)
 	{
     return in_array($project, ['norfab', 'profaba']);
+	}
+
+	private function getBaseQuery($request)
+	{
+		$project = $request->input('project');
+		$tableGP = $this->getPrefixedTableName($request, 'GP');
+    $tablePD = $this->getPrefixedTableName($request, 'PD');
+    $tablePH = $this->getPrefixedTableName($request, 'PH');
+    $tablePL = $this->getPrefixedTableName($request, 'PL');
+    $tableTR = $this->getPrefixedTableName($request, 'TR');
+    $tableSL = $this->getPrefixedTableName($request, 'SL');
+
+		$query = DB::table($tablePD)
+			->select(
+				$tablePH.'.PHID',
+				$tablePH.'.Date as PH_Date',
+				$tablePH.'.Score as PH_Score',
+				$tablePH.'.ScoredBy as PH_ScoredBy',
+        $tablePH.'.Comments as PH_Comments',
+        
+				$tablePD.'.PDID',
+				$tablePD.'.DescriptionOfTrait as PD_DescriptionOfTrait',
+				$tablePD.'.Grouping as PD_Grouping',
+				$tablePD.'.DescriptionOfMethod as PD_DescriptionOfMethod',
+        $tablePD.'.Comments as PD_Comments',
+
+        $tableSL.'.SLID',
+        $tableSL.'.HarvestDate as SL_HarvestDate',
+        $tableSL.'.HarvestLocation as SL_HarvestLocation',
+        $tableSL.'.ParentSLID as SL_ParentSLID',
+        $tableSL.'.Comments as SL_Comments',
+
+        $tableGP.'.GPID',
+        $tableGP.'.Name as GP_Name',
+        $tableGP.'.AlternativeName as GP_AlternativeName',
+        $tableGP.'.Donor as GP_Donor',
+        $tableGP.'.GeographicOrigin as GP_GeographicOrigin',
+        $tableGP.'.Maintaining as GP_Maintaining',
+        $tableGP.'.Comments as GP_Comments'
+			);
+
+		// ProFaba contains additional columns for TR table
+		$query->addSelect(
+			$tableTR.'.TRID',
+			$tableTR.'.GPSCoordinates as TR_GPSCoordinates',
+			$tableTR.'.PlotSize as TR_PlotSize',
+			$tableTR.'.PlotSizeIncludingpaths as TR_PlotSizeIncludingpaths',
+			$tableTR.'.SoilType as TR_SoilType'
+		);
+		if ($project === 'profaba') {
+			$query->addSelect(
+				$tableTR.'.SoilTexture as TR_SoilTexture',
+				$tableTR.'.SoilDepth as TR_SoilDepth',
+				$tableTR.'.Distance as TR_Distance'
+			);
+		}
+		$query->addSelect(
+			$tableTR.'.StartOfTrial as TR_StartOfTrial',
+			$tableTR.'.EndOfTrial as TR_EndOfTrial',
+			$tableTR.'.Description as TR_Description',
+			$tableTR.'.Manager as TR_Manager',
+			$tableTR.'.Comments as TR_Comments'
+		);
+
+		// NorFab and ProFaba contain different columns for PL table
+		$query->addSelect(
+			$tablePL.'.PLID',
+			$tablePL.'.GPSCoordinates as PL_GPSCoordinates'
+		);
+		if ($project === 'profaba') {
+			$query->addSelect(
+				$tablePL.'.Block as PL_Block',
+				$tablePL.'.Columns as PL_Columns',
+				$tablePL.'.Row as PL_Row'
+			);
+		}
+		if ($project === 'norfab') {
+			$query->addSelect(
+				$tablePL.'.ReplicateBlock as PL_ReplicateBlock'
+			);
+		}
+		$query->addSelect(
+			$tableTR.'.Comments as PL_Comments'
+		);
+
+		return $query;
 	}
 }
