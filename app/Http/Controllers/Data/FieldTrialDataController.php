@@ -272,20 +272,10 @@ class FieldTrialDataController extends Controller
 	}
 
 	private function getTrialDataByPhenotype(Request $request) {
-    $tableGP = $this->getPrefixedTableName($request, 'GP');
-    $tablePD = $this->getPrefixedTableName($request, 'PD');
     $tablePH = $this->getPrefixedTableName($request, 'PH');
-    $tablePL = $this->getPrefixedTableName($request, 'PL');
-    $tableTR = $this->getPrefixedTableName($request, 'TR');
-    $tableSL = $this->getPrefixedTableName($request, 'SL');
 
 		$query = $this->getBaseQuery($request);
 		$query
-			->leftJoin($tablePH, $tablePD.'.PDID', '=', $tablePH.'.PDID')
-			->leftJoin($tablePL, $tablePH.'.PLID', '=', $tablePL.'.PLID')
-      ->leftJoin($tableTR, $tablePL.'.TRID', '=', $tableTR.'.TRID')
-      ->leftJoin($tableSL, $tablePL.'.SLID', '=', $tableSL.'.SLID')
-      ->leftJoin($tableGP, $tableSL.'.GPID', '=', $tableGP.'.GPID')
 			->where([
 				[$tablePH.'.PDID', '=', $request->input('PDID')],
 			]);
@@ -294,20 +284,10 @@ class FieldTrialDataController extends Controller
 	}
 
 	private function getPhenotypesScoredByTrial(Request $request) {
-    $tableGP = $this->getPrefixedTableName($request, 'GP');
-    $tablePD = $this->getPrefixedTableName($request, 'PD');
-    $tablePH = $this->getPrefixedTableName($request, 'PH');
-    $tablePL = $this->getPrefixedTableName($request, 'PL');
-    $tableSL = $this->getPrefixedTableName($request, 'SL');
     $tableTR = $this->getPrefixedTableName($request, 'TR');
 
 		$query = $this->getBaseQuery($request);
 		$query
-			->leftJoin($tablePH, $tablePD.'.PDID', '=', $tablePH.'.PDID')
-			->leftJoin($tablePL, $tablePH.'.PLID', '=', $tablePL.'.PLID')
-      ->leftJoin($tableTR, $tablePL.'.TRID', '=', $tableTR.'.TRID')
-      ->leftJoin($tableSL, $tablePL.'.SLID', '=', $tableSL.'.SLID')
-      ->leftJoin($tableGP, $tableSL.'.GPID', '=', $tableGP.'.GPID')
 			->where([
 				[$tableTR.'.TRID', '=', $request->input('TRID')],
 			]);
@@ -316,20 +296,11 @@ class FieldTrialDataController extends Controller
 	}
 
 	private function getPhenotypeDataByTrialAndTrait(Request $request) {
-    $tableGP = $this->getPrefixedTableName($request, 'GP');
     $tablePD = $this->getPrefixedTableName($request, 'PD');
-    $tablePH = $this->getPrefixedTableName($request, 'PH');
-    $tablePL = $this->getPrefixedTableName($request, 'PL');
-    $tableSL = $this->getPrefixedTableName($request, 'SL');
     $tableTR = $this->getPrefixedTableName($request, 'TR');
 
 		$query = $this->getBaseQuery($request);
 		$query
-			->leftJoin($tablePH, $tablePD.'.PDID', '=', $tablePH.'.PDID')
-			->leftJoin($tablePL, $tablePH.'.PLID', '=', $tablePL.'.PLID')
-      ->leftJoin($tableTR, $tablePL.'.TRID', '=', $tableTR.'.TRID')
-      ->leftJoin($tableSL, $tablePL.'.SLID', '=', $tableSL.'.SLID')
-      ->leftJoin($tableGP, $tableSL.'.GPID', '=', $tableGP.'.GPID')
 			->where([
 				[$tablePD.'.PDID', '=', $request->input('PDID')],
 				[$tableTR.'.TRID', '=', $request->input('TRID')],
@@ -499,6 +470,13 @@ class FieldTrialDataController extends Controller
 		$query->addSelect(
 			$tableTR.'.Comments as PL_Comments'
 		);
+
+		$query
+			->leftJoin($tablePH, $tablePD.'.PDID', '=', $tablePH.'.PDID')
+			->leftJoin($tablePL, $tablePH.'.PLID', '=', $tablePL.'.PLID')
+      ->leftJoin($tableTR, $tablePL.'.TRID', '=', $tableTR.'.TRID')
+      ->leftJoin($tableSL, $tablePL.'.SLID', '=', $tableSL.'.SLID')
+      ->leftJoin($tableGP, $tableSL.'.GPID', '=', $tableGP.'.GPID');
 
 		return $query;
 	}
